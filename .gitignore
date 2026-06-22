@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Proyecto
+.env
+data/raw/
+data/processed/
+*.json.progreso
+
+# Jupyter.ipynb_checkpoints/
+
+# Docker volumes
+docker/volumnes/
