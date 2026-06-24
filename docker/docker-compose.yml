@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: ${PG_DB}
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "${PG_PORT}:5432"
     volumes:
@@ -18,15 +19,5 @@ services:
       interval: 10s
       retries: 5
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: aprende_ollama
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-
 volumes:
   pg_data:
-  ollama_data:
