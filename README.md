@@ -206,3 +206,62 @@ clean_standarization_RAG/
 - **ChromaDB corre embebido** — no requiere contenedor Docker
 - **Ollama corre como servicio de Windows** — no en Docker
 - El archivo `.env` debe guardarse **sin BOM** (UTF-8 sin marca de orden de bytes)
+
+
+## Flujo de trabajo para poder realizar cambios
+
+### Primera vez para configuración inicial de cada uno una vez que hayan aceptado la invitación al repositorio
+
+1. Clonar el repositorio en una ruta sin acentos ni espacios para evitar problemas 
+
+Desde consola
+
+git clone https://github.com/yareeli21/clean_standarization_RAG.git
+cd clean_standarization_RAG
+
+3. Crear el entorno virtual e instalar dependencias
+
+Desde consola
+
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+4. Copiar el archivo de variables de entorno y llenarlo
+
+Desde consola
+
+copy .env.example .env
+
+5. Levantar PostgrerSQL
+
+Desde consola
+
+cd docker
+docker compose --env-file ../.env up -d
+
+6. Crear tu rama de trabajo, encuesta, entrevista y prueba estandarizada respectivamente
+
+Desde consola cada uno respecto a su insturmento (bueno, mientars así, a lo mejor después se puede hacer un merge de todo...)
+
+git checkout -b limpieza-encuestas
+git chechout -b limpieza-entrevistas
+git checkout -b limpieza-pruebas
+
+### Flujo diario 
+
+**Antes de empezar a trabajar**, en caso de que alguien haya hecho cambios, traerlos a nuestro equipo:
+
+Dese consola
+
+git pull origin main
+
+**Al terminar de trabajar** - guardar y subir tus cambios:
+
+Desde consola
+
+git add .
+git commit -m "feat: descripción breve de lo que hiciste"
+git push origin tu-rama
+
+
