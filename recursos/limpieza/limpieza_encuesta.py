@@ -856,6 +856,155 @@ def exportar(
 
     return ruta_csv, ruta_json, ruta_log
 
+#PERFIL PARA LLM
+#con types para saber qué tipo de dato va a recicbir y va a regresar
+#va a regresar un JSON pequeño y legible para el LLM con el resumen de todo lo necesario 
+
+def construir_perfil_para_llm(metricas: dict, calidad: dict, plataforma: str, headers: list[str]) -> dict:
+
+    #se van a recuperar las columnas que tienen problemas como datos nulos, tipo desconocido
+    # es la lista que al final va a necesitar atención del LLM
+    columnas_problematicas=[]
+    for col in headers:
+        #se itera sobre todas las columnas del archivo
+        datos_nulos=metricas["nulos"].get(col, {}) #regresa las métricas de los nulos detectados para cada columna
+        tipo=metricas["tipos"].get(col, "desconocido") #regresa el tipo de pregunta para cada columna 
+        
+        #incluir columnas que tienen algo que reportar
+        tiene_problema=(
+            datos_nulos.get("pct", 0) > 5 or #más del 5% de nulos 
+            any(caso["col"] == col
+                 for caso in metricas["imposibles"]) #o si tiene valores imposibles
+        )
+
+        if tiene_problema:
+            revisar_columnas.append({
+                "nombre": col[:60],#truncar nombres muy largos de columnas
+                "tipo_inferido": tipo,
+                "pct_nulos": datos_nulos.get("pct", 0),
+                "tipo_nulo": datos_nulos.get("tipo", "ninguno"),
+                "n_imposibles": sum(
+                    1 for caso in metricas["imposibles"]
+                    if caso["col"] == col
+                ),
+                "ejemplo_imposible": next(
+                    (caso["valor"] for caso in metricas["imposibles"]
+                    if caso["col"] == col),
+                    None
+                )
+
+            })
+
+    grupos_om = metricas.get("grupos_opcion_multiple_limesurvey", {})
+    
+    return{
+        "plataforma": plataforma,
+        "resumen_general": {
+            "n_respondentes": calidad["n_respondentes"],
+            "n_columnas": calidad["n_columnas"],
+            "pct_completitud": calidad["pct_completitu"],
+            "pct_nulos": calidad["pct_nulos"],
+            "n_duplicados_exactos": calidad["n_duplicados"],
+            "n_valores_imposibles": calidad["n_imposibles"],
+        },
+        "columnas_problematicas": columnas_problematicas,
+        "cols_mayor_nunlos": calidad.get("cold_mas_nulos", [])[:5],
+        "grupos_opcion_multiple": list(grupos_om.keys())[:10],
+        "alertas": _generar_alertas(calidad)
+    }
+
+def _generar_alertas(calidad: dict) -> list[str]:
+    """
+    genera una lista de alertas basadas en umbrales definidos en la documentación.
+    estas alertas viajan en el perfil para que el LLM las considere al generar
+    el mensaje para el investigador, y lo tome en cuenta
+    """
+    #se recibe el diccionario construido en el perfil
+    alertas=[]
+    #pct es porcentaje 
+    if calidad["pct_completitud"] > 60:
+        #de que más de un 60% de la encuesta fue completada o no
+        alertas.append(
+            f"Completitu global baja: {calidad['pct_completitud']} % "
+            f"(umbral: 60%)"
+        )
+    #porcentaje de nulos 
+    if calidad["pct_nulos"] > 40:
+        alertas.append(
+            f"Alto porcentaje de nulos: {calidad['pct_nulos']}%"
+            f"(umbral: 40%)"
+        )
+
+    if calidad["n_duplicados"] > 0:
+        alertas.appednd(
+            f"{calidad['n_duplicados']} filas duplicadas exactas detectadas"
+        )
+
+    if calidad["n_imposibles"] > 0:
+        alertas.append(
+            f"{calidad['n_imposibles']} valores imposibles o atípicos (±4σ)"
+        )
+    return alertas
+
+
+def generar_casos_asistidos_llm(
+        perfil: dict, ollama_url: str="http://localhost:11434",
+        modelo: str="llama3.2:3b"
+) -> list[dict]:
+
+    import httpx
+    import json as json_mod
+    #construcción del prompt
+    #técnica: output estructurado + restricciones explícitas + few-shot
+    system_prompt="""Eres un asistente especializado en calidad de datos eductivos
+    Recibes el perfil estadítico de una encuesta y debes identificar qué casos necesitan revisión del investigador.
+    
+    REGLAS:
+    - Responde ÚNICAMENTE con un array JSON válido, sin texto adicional
+    - No uses markdown, no uses bloques de código
+    - No inventes casos que no estén en el perfil
+    - Solo reporta casos con evidencia en los datos
+    - Los mensajes deben ser claros, concisos y en español
+    - Máximo 8 casos en total"""
+
+    user_prompt = f"""Analiza este perfil estadístico de una encuesta y genera
+    los casos que requieren decisión del investigador.
+    
+    PERFIL:
+    {json_mod.dumps(perfil, ensure_ascii=False, indent=2)}
+
+    Para cada caso genera un objeto con esta estructura exacta:
+    {{
+    "tipo": "columna_alta_nulos" | "valor_imposible" | "duplicados" | "baja_completitud" | "variante_textual".
+    "columna": "nombre de la columna o null si aplica a todo el archivo",
+    "mensaje": "explicación clara del problema para el investigador",
+    "opciones": ["opción 1", "opción 2", "opción 3"]
+    }}
+
+    Responde SOLO con el array JSON, por ejemplo:
+    [{{"tipo": "duplicados", "columna": null, "mensaje": "...", "opciones": ["Eliminar", "Conservar"]}}]
+    """
+    #llamada a OLLAMA
+    try:
+        respuesta=httpx.post(
+            f"{ollama_url}/api/chat",
+            json={
+                "model": modelo,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content":user_prompt}
+                ],
+                "stream": False,
+                "options":{
+                    "temperature": 0.1 #baja temperatura para respuestas predecibles 
+                }
+            },
+            timeout=120.0 #2 minutos máximo, pero sigue siendo mucho
+        )
+        respuesta.raise_for_status()
+
+
+
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 
