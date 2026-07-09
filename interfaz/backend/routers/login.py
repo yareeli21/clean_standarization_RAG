@@ -5,7 +5,7 @@ Responsable de esta pantalla: [asignar integrante]
 
 TODO para quien desarrolle esta pantalla:
 - Agregar endpoint POST /login que valide credenciales
-- Conectar con la tabla correspondiente en PostgreSQL (o el mecanismo de auth que definan)
+- Conectar con la tabla correspondiente en PostgreSQL (o el mecanismo de login que definan)
 - Manejar sesión (cookies / JWT, lo que decidan)
 """
 from fastapi import APIRouter, Request
