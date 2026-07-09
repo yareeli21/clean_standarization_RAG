@@ -1,0 +1,143 @@
+/* ============================================
+   VARIABLES DE PALETA — Aprende RAG
+   ============================================ */
+:root {
+  --color-rosa-mauve: #C38EB4;
+  --color-rosa-claro: #E1CBD7;
+  --color-azul-cielo: #86A8CF;
+  --color-azul-petroleo: #26425A;
+
+  /* Derivados para fondo/texto, manteniendo la familia de la paleta */
+  --color-fondo-oscuro: #17293A;   /* más oscuro que petróleo, para header/nav */
+  --color-texto-claro: #FDFBFC;
+  --color-texto-oscuro: #1C2B36;
+  --color-borde: #C9D7E3;
+
+  --radio-borde: 10px;
+  --sombra-suave: 0 2px 8px rgba(38, 66, 90, 0.15);
+
+  --fuente-base: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-base);
+  background-color: var(--color-rosa-claro);
+  color: var(--color-texto-oscuro);
+}
+
+/* ============================================
+   NAV SUPERIOR
+   ============================================ */
+.nav-principal {
+  background-color: var(--color-fondo-oscuro);
+  color: var(--color-texto-claro);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+  box-shadow: var(--sombra-suave);
+}
+
+.nav-principal .marca {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-rosa-claro);
+}
+
+.nav-principal .enlaces {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-principal a {
+  color: var(--color-texto-claro);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radio-borde);
+  transition: background-color 0.15s ease;
+}
+
+.nav-principal a:hover,
+.nav-principal a:focus-visible {
+  background-color: var(--color-azul-petroleo);
+}
+
+.nav-principal a.activo {
+  background-color: var(--color-rosa-mauve);
+  color: var(--color-texto-claro);
+}
+
+/* ============================================
+   CONTENEDOR GENERAL
+   ============================================ */
+.contenedor {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.tarjeta {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--sombra-suave);
+  margin-bottom: 1rem;
+}
+
+h1 {
+  color: var(--color-azul-petroleo);
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitulo {
+  color: var(--color-azul-cielo);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.etiqueta {
+  display: inline-block;
+  background-color: var(--color-azul-cielo);
+  color: var(--color-texto-claro);
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+}
+
+.boton {
+  background-color: var(--color-azul-petroleo);
+  color: var(--color-texto-claro);
+  border: none;
+  border-radius: var(--radio-borde);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.boton:hover,
+.boton:focus-visible {
+  background-color: var(--color-rosa-mauve);
+}
+
+.campo {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.campo:focus-visible {
+  outline: 2px solid var(--color-azul-cielo);
+  outline-offset: 1px;
+}
