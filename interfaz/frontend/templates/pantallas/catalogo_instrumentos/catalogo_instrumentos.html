@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Catálogo de instrumentos</h1>
+<p class="subtitulo">Selecciona en qué instrumento quieres buscar</p>
+
+<div class="caja-busqueda">
+    <button class="boton-busqueda" data-instrumento="encuestas">
+        📋 Buscar en Encuestas
+    </button>
+    <button class="boton-busqueda" data-instrumento="entrevistas">
+        🎙️ Buscar en Entrevistas
+    </button>
+    <button class="boton-busqueda" data-instrumento="pruebas_estandarizadas">
+        📝 Buscar en Pruebas estandarizadas
+    </button>
+    <button class="boton-busqueda boton-busqueda--todos" data-instrumento="todos">
+        🔎 Buscar en Todos
+    </button>
+</div>
+
+<!-- Tu listado de instrumentos original sigue abajo -->
+{% for instrumento in instrumentos %}
+<div class="tarjeta" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <span class="etiqueta">{{ instrumento.tipo }}</span>
+        <h3 style="margin: 0.5rem 0 0.25rem 0;">{{ instrumento.nombre }}</h3>
+    </div>
+    <span style="color: var(--color-azul-petroleo); font-weight: 600;">{{ instrumento.estado }}</span>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block css_extra %}
+<style>
+    /* Este CSS solo aplica a ESTA pantalla, no afecta a las demás */
+    .caja-busqueda {
+        background-color: var(--color-azul-petroleo);
+        border-radius: 16px;
+        padding: 2.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--sombra-suave);
+    }
+
+    .boton-busqueda {
+        background-color: var(--color-azul-cielo);
+        color: var(--color-texto-claro);
+        border: none;
+        border-radius: 12px;
+        padding: 1.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .boton-busqueda:hover {
+        background-color: var(--color-rosa-mauve);
+        transform: translateY(-2px);
+    }
+
+    .boton-busqueda--todos {
+        grid-column: span 2;
+        background-color: var(--color-rosa-mauve);
+    }
+
+    .boton-busqueda--todos:hover {
+        background-color: var(--color-azul-cielo);
+    }
+</style>
+{% endblock %}
+
+{% block js_extra %}
+<script>
+    // Aquí capturas el clic y decides qué hacer (llamar a tu endpoint de búsqueda, etc.)
+    document.querySelectorAll('.boton-busqueda').forEach(boton => {
+        boton.addEventListener('click', () => {
+            const instrumento = boton.dataset.instrumento;
+            console.log('Buscar en:', instrumento);
+            // TODO: aquí harías fetch('/instrumentos/buscar', {...}) con el instrumento elegido
+        });
+    });
+</script>
+{% endblock %}

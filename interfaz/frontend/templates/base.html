@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} · {{ request.app.state.nombre_proyecto }}</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    {% block css_extra %}{% endblock %}
+</head>
+<body>
+
+    <nav class="nav-principal">
+        <span class="marca">{{ request.app.state.nombre_proyecto }}</span>
+        <div class="enlaces">
+            <a href="/login" class="{{ 'activo' if request.url.path == '/login' else '' }}">Login</a>
+            <a href="/kpis" class="{{ 'activo' if request.url.path == '/kpis' else '' }}">KPIs</a>
+            <a href="/instrumentos" class="{{ 'activo' if request.url.path == '/instrumentos' else '' }}">Instrumentos</a>
+            <a href="/chat" class="{{ 'activo' if request.url.path == '/chat' else '' }}">Chat IA</a>
+        </div>
+    </nav>
+
+    <main class="contenedor">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/js/base.js"></script>
+    {% block js_extra %}{% endblock %}
+</body>
+</html>

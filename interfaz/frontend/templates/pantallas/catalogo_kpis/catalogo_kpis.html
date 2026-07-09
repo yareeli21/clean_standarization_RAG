@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Catálogo de KPIs</h1>
+<p class="subtitulo">Indicadores disponibles por tipo de instrumento</p>
+
+{% if kpis %}
+    {% for kpi in kpis %}
+    <div class="tarjeta">
+        <span class="etiqueta">{{ kpi.instrumento }}</span>
+        <h3 style="margin: 0.5rem 0 0.25rem 0;">{{ kpi.nombre }}</h3>
+        <p style="margin: 0; color: var(--color-azul-petroleo);">{{ kpi.descripcion }}</p>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="tarjeta" style="text-align: center; color: var(--color-azul-petroleo);">
+        Todavía no hay KPIs registrados en la base de datos.<br>
+        En cuanto se agreguen, aparecerán aquí automáticamente.
+    </div>
+{% endif %}
+
+<!--
+    TODO (responsable de esta pantalla):
+    - Reemplazar KPIS_EJEMPLO (en routers/kpis.py) por consulta real a la tabla `kpi`
+    - Agregar filtro por instrumento
+    - Definir vista de detalle (¿modal? ¿página aparte?)
+-->
+{% endblock %}

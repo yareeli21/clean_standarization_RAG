@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Iniciar sesión</h1>
+<p class="subtitulo">Accede al módulo de consulta y limpieza de instrumentos</p>
+
+<div class="tarjeta" style="max-width: 380px; margin: 2rem auto;">
+    <form>
+        <label for="usuario">Usuario</label>
+        <input class="campo" type="text" id="usuario" name="usuario" placeholder="usuario@ejemplo.com">
+
+        <label for="contrasena">Contraseña</label>
+        <input class="campo" type="password" id="contrasena" name="contrasena" placeholder="••••••••">
+
+        <button class="boton" type="submit" style="width: 100%;">Entrar</button>
+    </form>
+</div>
+
+<!--
+    TODO (responsable de esta pantalla):
+    - Conectar el submit del form a POST /login
+    - Manejar mensaje de error de credenciales inválidas
+    - Redirigir a /kpis (o la pantalla de inicio que definan) tras login exitoso
+-->
+{% endblock %}
