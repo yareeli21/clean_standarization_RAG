@@ -12,6 +12,7 @@
     <nav class="nav-principal">
         <span class="marca">{{ request.app.state.nombre_proyecto }}</span>
         <div class="enlaces">
+            <link rel="icon" type="image/png" href="{{ url_for('static', path='favicon.png') }}">
             <a href="/login" class="{{ 'activo' if request.url.path == '/login' else '' }}">Login</a>
             <a href="/kpis" class="{{ 'activo' if request.url.path == '/kpis' else '' }}">KPIs</a>
             <a href="/instrumentos" class="{{ 'activo' if request.url.path == '/instrumentos' else '' }}">Instrumentos</a>

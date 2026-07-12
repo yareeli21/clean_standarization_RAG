@@ -1,87 +1,190 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Catálogo de instrumentos</h1>
-<p class="subtitulo">Selecciona en qué instrumento quieres buscar</p>
+<div class="encabezado-catalogo">
+    <p class="eyebrow">Repositorio de instrumentos · Aprende RAG</p>
+    <h1>Catálogo de instrumentos</h1>
+    <p class="subtitulo">Selecciona en qué instrumento quieres buscar</p>
+</div>
 
-<div class="caja-busqueda">
-    <button class="boton-busqueda" data-instrumento="encuestas">
-        📋 Buscar en Encuestas
+<div class="selector-instrumentos">
+    <button class="pestana-instrumento" data-instrumento="encuestas">
+        <svg class="icono-instrumento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="4" y="3" width="16" height="18" rx="2"/>
+            <path d="M8 8h8M8 12h8M8 16h5"/>
+        </svg>
+        <span>Encuestas</span>
     </button>
-    <button class="boton-busqueda" data-instrumento="entrevistas">
-        🎙️ Buscar en Entrevistas
+    <button class="pestana-instrumento" data-instrumento="entrevistas">
+        <svg class="icono-instrumento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>
+        </svg>
+        <span>Entrevistas</span>
     </button>
-    <button class="boton-busqueda" data-instrumento="pruebas_estandarizadas">
-        📝 Buscar en Pruebas estandarizadas
+    <button class="pestana-instrumento" data-instrumento="pruebas_estandarizadas">
+        <svg class="icono-instrumento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+            <path d="M9 13l2 2 4-4"/>
+        </svg>
+        <span>Pruebas estandarizadas</span>
     </button>
-    <button class="boton-busqueda boton-busqueda--todos" data-instrumento="todos">
-        🔎 Buscar en Todos
+    <button class="pestana-instrumento pestana-instrumento--todos" data-instrumento="todos">
+        <svg class="icono-instrumento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <span>Buscar en todos</span>
     </button>
 </div>
 
-<!-- Tu listado de instrumentos original sigue abajo -->
-{% for instrumento in instrumentos %}
-<div class="tarjeta" style="display: flex; justify-content: space-between; align-items: center;">
-    <div>
+<div class="rejilla-instrumentos" id="rejilla-instrumentos">
+    {% for instrumento in instrumentos %}
+    <article class="ficha-instrumento ficha-instrumento--{{ instrumento.tipo_slug }}">
+        <div class="ficha-cabecera">
+            <span class="codigo-catalogo">{{ instrumento.codigo }}</span>
+            <span class="estado-pill estado-pill--{{ instrumento.estado_slug }}">{{ instrumento.estado }}</span>
+        </div>
         <span class="etiqueta">{{ instrumento.tipo }}</span>
-        <h3 style="margin: 0.5rem 0 0.25rem 0;">{{ instrumento.nombre }}</h3>
+        <h3 class="ficha-titulo">{{ instrumento.nombre }}</h3>
+    </article>
+    {% else %}
+    <div class="estado-vacio">
+        <p>Todavía no hay instrumentos procesados.</p>
+        <p class="estado-vacio__detalle">En cuanto se cargue uno desde el pipeline de limpieza, aparecerá aquí automáticamente.</p>
     </div>
-    <span style="color: var(--color-azul-petroleo); font-weight: 600;">{{ instrumento.estado }}</span>
+    {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}
 
 {% block css_extra %}
 <style>
-    /* Este CSS solo aplica a ESTA pantalla, no afecta a las demás */
-    .caja-busqueda {
-        background-color: var(--color-azul-petroleo);
-        border-radius: 16px;
-        padding: 2.5rem;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        margin-bottom: 2rem;
-        box-shadow: var(--sombra-suave);
-    }
+.encabezado-catalogo { margin-bottom: 2rem; }
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-rosa-mauve);
+    margin: 0 0 0.5rem 0;
+}
 
-    .boton-busqueda {
-        background-color: var(--color-azul-cielo);
-        color: var(--color-texto-claro);
-        border: none;
-        border-radius: 12px;
-        padding: 1.5rem;
-        font-size: 1.05rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.15s ease, background-color 0.15s ease;
-    }
+.selector-instrumentos {
+    background-color: var(--color-azul-petroleo);
+    border-radius: 18px;
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--sombra-suave);
+}
+.pestana-instrumento {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: transparent;
+    color: var(--color-texto-claro);
+    border: none;
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.pestana-instrumento:hover {
+    background-color: rgba(134, 168, 207, 0.25);
+    transform: translateY(-1px);
+}
+.pestana-instrumento.activa {
+    background-color: var(--color-azul-cielo);
+}
+.icono-instrumento { width: 20px; height: 20px; flex-shrink: 0; }
 
-    .boton-busqueda:hover {
-        background-color: var(--color-rosa-mauve);
-        transform: translateY(-2px);
-    }
+.pestana-instrumento--todos {
+    grid-column: span 3;
+    background-color: var(--color-rosa-mauve);
+    justify-content: center;
+    margin-top: 0.2rem;
+}
+.pestana-instrumento--todos:hover {
+    background-color: var(--color-azul-cielo);
+}
 
-    .boton-busqueda--todos {
-        grid-column: span 2;
-        background-color: var(--color-rosa-mauve);
-    }
+.rejilla-instrumentos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.1rem;
+}
 
-    .boton-busqueda--todos:hover {
-        background-color: var(--color-azul-cielo);
-    }
+.ficha-instrumento {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--sombra-suave);
+    border-left: 5px solid var(--color-azul-cielo);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ficha-instrumento:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(38, 66, 90, 0.15);
+}
+.ficha-instrumento--encuesta { border-left-color: var(--color-azul-cielo); }
+.ficha-instrumento--entrevista { border-left-color: var(--color-rosa-mauve); }
+.ficha-instrumento--prueba-estandarizada { border-left-color: var(--color-azul-petroleo); }
+
+.ficha-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+.codigo-catalogo {
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--color-azul-petroleo);
+    opacity: 0.55;
+}
+.estado-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
+.estado-pill--vectorizado { background: #DCEFE1; color: #1F7A3D; }
+.estado-pill--estandarizado { background: #DCEAF9; color: var(--color-azul-petroleo); }
+.estado-pill--limpio { background: #FBEFD9; color: #9A6A00; }
+.estado-pill--ingresado { background: #F1E1E9; color: var(--color-rosa-mauve); }
+
+.ficha-titulo { margin: 0.4rem 0 0 0; font-size: 1.05rem; }
+
+.estado-vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: var(--sombra-suave);
+}
+.estado-vacio__detalle { color: var(--color-azul-cielo); font-size: 0.9rem; }
 </style>
 {% endblock %}
 
 {% block js_extra %}
 <script>
-    // Aquí capturas el clic y decides qué hacer (llamar a tu endpoint de búsqueda, etc.)
-    document.querySelectorAll('.boton-busqueda').forEach(boton => {
-        boton.addEventListener('click', () => {
-            const instrumento = boton.dataset.instrumento;
-            console.log('Buscar en:', instrumento);
-            // TODO: aquí harías fetch('/instrumentos/buscar', {...}) con el instrumento elegido
-        });
+document.querySelectorAll('.pestana-instrumento').forEach(boton => {
+    boton.addEventListener('click', async () => {
+        document.querySelectorAll('.pestana-instrumento').forEach(b => b.classList.remove('activa'));
+        boton.classList.add('activa');
+        const instrumento = boton.dataset.instrumento;
+
+        const respuesta = await fetch(`/instrumentos/buscar?tipo=${instrumento}`);
+        if (!respuesta.ok) return;
+        const html = await respuesta.text();
+        document.getElementById('rejilla-instrumentos').innerHTML = html;
     });
+});
 </script>
 {% endblock %}
