@@ -1,7 +1,7 @@
 """
 Router: Catálogo de KPIs
 
-Responsable de esta pantalla: [asignar integrante]
+Responsable de esta pantalla: layla Hernande
 
 Ya conectado a PostgreSQL de verdad: consulta la tabla `kpi`.
 Si la tabla todavía no tiene registros (o la BD ni siquiera está corriendo
@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 async def ver_catalogo_kpis(request: Request):
     kpis = ejecutar_query(
         """
-        SELECT nombre, instrumento, descripcion
+        SELECT  id, nombre, descripcion, objetivo, razon 
         FROM kpi
         ORDER BY nombre;
         """

@@ -10,7 +10,10 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from backend.core.config import STATIC_DIR, NOMBRE_PROYECTO
-from backend.routers import login, kpis, instrumentos, chat
+from backend.routers import login, kpis, instrumentos, chat, cargar
+
+
+
 
 app = FastAPI(title=NOMBRE_PROYECTO)
 app.state.nombre_proyecto = NOMBRE_PROYECTO  # disponible para los templates vía request.app.state
@@ -24,3 +27,4 @@ app.include_router(login.router)
 app.include_router(kpis.router)
 app.include_router(instrumentos.router)
 app.include_router(chat.router)
+app.include_router(cargar.router)

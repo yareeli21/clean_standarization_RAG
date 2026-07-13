@@ -1,6 +1,12 @@
 """
 Router: Catálogo de instrumentos
 Responsable de esta pantalla: Yare
+
+Ya conectado a PostgreSQL de verdad: consulta la tabla `instrumento_procesado`.
+Si la tabla todavía no tiene registros (o la BD ni siquiera está corriendo
+todavía), la pantalla muestra un estado vacío en vez de tronar. En cuanto
+existan filas ahí, solo hay que volver a correr el proyecto y aparecerán
+solas — no se necesita tocar este código.
 """
 from fastapi import APIRouter, Request, Query
 from fastapi.responses import HTMLResponse
@@ -11,34 +17,32 @@ from backend.core.db import ejecutar_query
 router = APIRouter(tags=["instrumentos"])
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-# Mapeo de estado real (columna `estado` en instrumento_procesado) -> clase CSS
-ESTADOS_SLUG = {
-    "ingresado": "ingresado",
-    "limpio": "limpio",
-    "estandarizado": "estandarizado",
-    "vectorizado": "vectorizado",
+PREFIJOS_CODIGO = {
+    "encuesta": "ENC",
+    "entrevista": "ENT",
+    "prueba estandarizada": "PRB",
 }
 
 
 def _preparar_instrumentos(filas: list[dict]) -> list[dict]:
-    """Agrega campos derivados (slug de tipo, slug de estado, código de catálogo)."""
-    prefijos = {"encuesta": "ENC", "entrevista": "ENT", "prueba estandarizada": "PRB"}
+    """Agrega campos derivados: tipo legible, slug para CSS y código de catálogo."""
     resultado = []
     for i, fila in enumerate(filas, start=1):
-        tipo = fila.get("plataforma") or fila.get("tipo", "instrumento")
+        tipo = fila.get("plataforma") or "Instrumento"
         tipo_normalizado = tipo.lower()
-        prefijo = next((v for k, v in prefijos.items() if k in tipo_normalizado), "INS")
+        prefijo = next(
+            (v for k, v in PREFIJOS_CODIGO.items() if k in tipo_normalizado), "INS"
+        )
         resultado.append({
             **fila,
             "tipo": tipo,
             "tipo_slug": tipo_normalizado.replace(" ", "-"),
-            "estado_slug": ESTADOS_SLUG.get(fila.get("estado", ""), "ingresado"),
             "codigo": f"{prefijo}·{i:03d}",
         })
     return resultado
 
 
-def _obtener_instrumentos(tipo: str | None = None) -> list[dict]:
+def _obtener_instrumentos(tipo: str = "todos") -> list[dict]:
     if tipo and tipo != "todos":
         filas = ejecutar_query(
             """

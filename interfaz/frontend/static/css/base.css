@@ -2,19 +2,28 @@
    VARIABLES DE PALETA — Aprende RAG
    ============================================ */
 :root {
-  --color-rosa-mauve: #C38EB4;
-  --color-rosa-claro: #E1CBD7;
-  --color-azul-cielo: #86A8CF;
-  --color-azul-petroleo: #26425A;
+  --color-rosa-mauve: #ffba00;      /* antes #C38EB4 → ahora Amarillo-Naranja */
+  --color-rosa-claro: #d8cfbc;      /* antes #E1CBD7 → ahora Beige */
+  --color-azul-cielo: #6d9773;      /* antes #86A8CF → ahora Verde claro */
+  --color-azul-petroleo: #0c3b2e;   /* antes #26425A → ahora Verde oscuro */
 
-  /* Derivados para fondo/texto, manteniendo la familia de la paleta */
-  --color-fondo-oscuro: #17293A;   /* más oscuro que petróleo, para header/nav */
+  --color-smoky-Black: #11120D;
+  --color-Olive-Drab: #565449;
+  --color-Bone: #D8CFBC;
+  --color-Floral-White: #fffbf4;
+
+  --color-Amarillo-Naranja: #ffba00;
+  --color-verde-oscuro: #0c3b2e;
+  --color-verde-claro: #6d9773;
+  --color-beige: #d8cfbc;
+
+  --color-fondo-oscuro: #0a2e22;    /* un poco más oscuro que verde-oscuro, para el nav */
   --color-texto-claro: #FDFBFC;
   --color-texto-oscuro: #1C2B36;
-  --color-borde: #C9D7E3;
+  --color-borde: #c9c3b0;
 
   --radio-borde: 10px;
-  --sombra-suave: 0 2px 8px rgba(38, 66, 90, 0.15);
+  --sombra-suave: 0 2px 8px rgba(12, 59, 46, 0.15);
 
   --fuente-base: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -98,8 +107,9 @@ h1 {
 }
 
 .subtitulo {
-  color: var(--color-azul-cielo);
+  color: var(--color-azul-petroleo);
   font-size: 0.95rem;
+  font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
@@ -140,4 +150,87 @@ h1 {
 .campo:focus-visible {
   outline: 2px solid var(--color-azul-cielo);
   outline-offset: 1px;
+}
+
+.tarjetas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+/* ============================================
+   BARRA LATERAL (sidebar)
+   ============================================ */
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.barra-lateral {
+    width: 230px;
+    background-color: var(--color-azul-petroleo);
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem 1.25rem;
+    flex-shrink: 0;
+}
+
+.marca-lateral {
+    color: var(--color-texto-claro);
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 2.5rem;
+}
+
+.nav-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.item-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-texto-claro);
+    text-decoration: none;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.15s ease;
+}
+.item-nav:hover { background-color: rgba(134, 168, 207, 0.2); }
+.item-nav.activo { background-color: var(--color-azul-cielo); }
+.icono-nav { width: 20px; height: 20px; flex-shrink: 0; }
+
+.usuario-lateral {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+.avatar-usuario {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--color-rosa-mauve);
+    color: var(--color-texto-claro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.nombre-usuario { color: var(--color-texto-claro); font-weight: 600; font-size: 0.9rem; }
+.cerrar-sesion { color: var(--color-azul-cielo); font-size: 0.8rem; text-decoration: none; }
+.cerrar-sesion:hover { text-decoration: underline; }
+
+.contenedor.con-barra-lateral {
+    flex-grow: 1;
+    padding: 2.5rem 3rem;
+    overflow-y: auto;
 }
