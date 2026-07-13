@@ -7,15 +7,15 @@ Este módulo se reutiliza desde cualquier router que necesite consultar la BD.
 import os
 import psycopg2
 import psycopg2.extras
+from dotenv import load_dotenv
+load_dotenv()
 
-# TODO: mover estos valores a un archivo .env y leerlos con python-dotenv,
-# en vez de dejarlos escritos aquí (por seguridad, sobre todo la contraseña).
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
     "port": os.getenv("DB_PORT", "5432"),
-    "dbname": os.getenv("DB_NAME", "aprende_rag"),
+    "dbname": os.getenv("DB_NAME", "postgres_lay"),
     "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres"),
+    "password": os.getenv("DB_PASSWORD", "Lucassini11"),
 }
 
 
@@ -27,11 +27,9 @@ def obtener_conexion():
 def ejecutar_query(query: str, parametros: tuple = None) -> list[dict]:
     """
     Ejecuta un SELECT y regresa una lista de dicts.
-
-    Si la base de datos aún no existe, no está corriendo, o la tabla está
-    vacía, regresa una lista vacía [] en vez de tronar — así la pantalla
-    simplemente muestra "sin datos" hasta que la información exista de verdad.
+    Si algo falla, regresa [] en vez de tronar.
     """
+    conexion = None
     try:
         conexion = obtener_conexion()
         with conexion:
@@ -43,7 +41,24 @@ def ejecutar_query(query: str, parametros: tuple = None) -> list[dict]:
         print(f"[aviso] No se pudo consultar la BD todavía: {error}")
         return []
     finally:
-        try:
+        if conexion:
             conexion.close()
-        except Exception:
-            pass
+
+
+def ejecutar_comando(query: str, parametros: tuple = None) -> bool:
+    """
+    Ejecuta un INSERT/UPDATE/DELETE. Regresa True si se ejecutó bien.
+    """
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion:
+            with conexion.cursor() as cursor:
+                cursor.execute(query, parametros)
+        return True
+    except psycopg2.Error as error:
+        print(f"[aviso] No se pudo ejecutar el comando: {error}")
+        return False
+    finally:
+        if conexion:
+            conexion.close()
