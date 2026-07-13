@@ -1,6 +1,9 @@
 import os
 import psycopg
 from psycopg.rows import dict_row
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
@@ -10,15 +13,17 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD", "postgres"),
 }
 
+
 def obtener_conexion():
-    """Regresa una conexión nueva a PostgreSQL."""
+    """Regresa una conexion nueva a PostgreSQL."""
     return psycopg.connect(**DB_CONFIG, row_factory=dict_row)
+
 
 def ejecutar_query(query: str, parametros: tuple = None) -> list[dict]:
     """
     Ejecuta un SELECT y regresa una lista de dicts.
-    Si la base de datos aún no existe, no está corriendo, o la tabla está
-    vacía, regresa una lista vacía [] en vez de tronar.
+    Si la base de datos aun no existe, no esta corriendo, o la tabla esta
+    vacia, regresa una lista vacia [] en vez de tronar.
     """
     try:
         with psycopg.connect(**DB_CONFIG, row_factory=dict_row) as conexion:
@@ -27,5 +32,17 @@ def ejecutar_query(query: str, parametros: tuple = None) -> list[dict]:
                 filas = cursor.fetchall()
                 return [dict(fila) for fila in filas]
     except psycopg.Error as error:
-        print(f"[aviso] No se pudo consultar la BD todavía: {error}")
+        print(f"[aviso] No se pudo consultar la BD todavia: {error}")
         return []
+
+
+def ejecutar_comando(query: str, parametros: tuple = None) -> bool:
+    """Ejecuta un INSERT/UPDATE/DELETE. Regresa True si se ejecuto bien."""
+    try:
+        with psycopg.connect(**DB_CONFIG) as conexion:
+            with conexion.cursor() as cursor:
+                cursor.execute(query, parametros)
+        return True
+    except psycopg.Error as error:
+        print(f"[aviso] No se pudo ejecutar el comando: {error}")
+        return False
