@@ -14,7 +14,7 @@ from backend.routers import login, kpis, instrumentos, chat
 
 app = FastAPI(title=NOMBRE_PROYECTO)
 app.state.nombre_proyecto = NOMBRE_PROYECTO  # disponible para los templates vía request.app.state
-app.state.nombre_proyecto = NOMBRE_PROYECTO  # disponible para los templates vía request.app.state
+
 
 # Sirve CSS/JS/imágenes desde /static/...
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
