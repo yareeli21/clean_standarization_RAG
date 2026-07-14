@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Cargar instrumento</h1>
+<p class="subtitulo">Registra un instrumento nuevo para su limpieza y estandarización</p>
+
+{% if mensaje %}
+<div class="tarjeta" style="color: {{ 'var(--color-azul-petroleo)' if ok else '#c0392b' }}; font-weight: 600;">
+    {{ mensaje }}
+</div>
+{% endif %}
+
+<div class="tarjeta tarjeta-formulario">
+    <form method="post" action="/cargar" enctype="multipart/form-data">
+        <label class="etiqueta-campo">Nombre del instrumento</label>
+        <input class="campo" type="text" name="nombre" placeholder="Encuesta de clima escolar 2025" required>
+
+        <label class="etiqueta-campo">Tipo de instrumento</label>
+        <select class="campo" name="tipo" required>
+            <option value="" disabled selected>Selecciona un tipo</option>
+            <option value="Encuesta">Encuesta</option>
+            <option value="Entrevista">Entrevista</option>
+            <option value="Prueba estandarizada">Prueba estandarizada</option>
+        </select>
+
+        <label class="etiqueta-campo">Archivo</label>
+        <input class="campo" type="file" name="archivo" required>
+
+        <button class="boton" type="submit">Cargar instrumento</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block css_extra %}
+<style>
+    .tarjeta-formulario { max-width: 480px; }
+    .etiqueta-campo {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--color-azul-petroleo);
+        margin-bottom: 0.35rem;
+    }
+</style>
+{% endblock %}

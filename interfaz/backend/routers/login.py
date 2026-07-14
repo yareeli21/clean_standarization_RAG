@@ -31,7 +31,6 @@ async def procesar_login(
         "SELECT id, usuario, password_hash FROM usuarios WHERE usuario = %s",
         (usuario,),
     )
-
     if not filas or not verificar_password(password, filas[0]["password_hash"]):
         return templates.TemplateResponse(
             request,

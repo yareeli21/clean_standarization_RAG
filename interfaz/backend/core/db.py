@@ -1,13 +1,8 @@
-"""
-Conexión a PostgreSQL.
-
-Ajusta los valores de conexión aquí (o mejor, en un archivo .env — ver abajo).
-Este módulo se reutiliza desde cualquier router que necesite consultar la BD.
-"""
 import os
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 from dotenv import load_dotenv
+
 load_dotenv()
 
 DB_CONFIG = {
@@ -20,45 +15,35 @@ DB_CONFIG = {
 
 
 def obtener_conexion():
-    """Regresa una conexión nueva a PostgreSQL."""
-    return psycopg2.connect(**DB_CONFIG, cursor_factory=psycopg2.extras.RealDictCursor)
+    """Regresa una conexion nueva a PostgreSQL."""
+    return psycopg.connect(**DB_CONFIG, row_factory=dict_row)
 
 
 def ejecutar_query(query: str, parametros: tuple = None) -> list[dict]:
     """
     Ejecuta un SELECT y regresa una lista de dicts.
-    Si algo falla, regresa [] en vez de tronar.
+    Si la base de datos aun no existe, no esta corriendo, o la tabla esta
+    vacia, regresa una lista vacia [] en vez de tronar.
     """
     conexion = None
     try:
-        conexion = obtener_conexion()
-        with conexion:
+        with psycopg.connect(**DB_CONFIG, row_factory=dict_row) as conexion:
             with conexion.cursor() as cursor:
                 cursor.execute(query, parametros)
                 filas = cursor.fetchall()
                 return [dict(fila) for fila in filas]
-    except psycopg2.Error as error:
-        print(f"[aviso] No se pudo consultar la BD todavía: {error}")
+    except psycopg.Error as error:
+        print(f"[aviso] No se pudo consultar la BD todavia: {error}")
         return []
-    finally:
-        if conexion:
-            conexion.close()
 
 
 def ejecutar_comando(query: str, parametros: tuple = None) -> bool:
-    """
-    Ejecuta un INSERT/UPDATE/DELETE. Regresa True si se ejecutó bien.
-    """
-    conexion = None
+    """Ejecuta un INSERT/UPDATE/DELETE. Regresa True si se ejecuto bien."""
     try:
-        conexion = obtener_conexion()
-        with conexion:
+        with psycopg.connect(**DB_CONFIG) as conexion:
             with conexion.cursor() as cursor:
                 cursor.execute(query, parametros)
         return True
-    except psycopg2.Error as error:
+    except psycopg.Error as error:
         print(f"[aviso] No se pudo ejecutar el comando: {error}")
         return False
-    finally:
-        if conexion:
-            conexion.close()
