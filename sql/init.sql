@@ -580,3 +580,7 @@ VALUES
                         ' El crecimiento constante indica una creciente demanda y una mejor reputación.'
                         );
                         
+INSERT INTO USUARIOS 
+(usuario, password_hash )
+VALUES
+('admin','\$2b\$12\$Tv4.xxi0qVZPSGSVNjFvUOzXA2O1Kw7wJtvAYYlHU9UZwzdjholbm');
