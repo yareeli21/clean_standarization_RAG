@@ -33,6 +33,10 @@
 }
 
 body {
+  display: flex;
+  height: 100vh;      /* antes: min-height: 100vh */
+  margin: 0;
+  overflow: hidden;   /* evita el scroll del body completo */
   margin: 0;
   font-family: var(--fuente-base);
   background-color: var(--color-rosa-claro);
@@ -56,6 +60,9 @@ body {
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--color-rosa-claro);
+}
+html, body {
+    height: 100%;
 }
 
 .nav-principal .enlaces {
@@ -161,10 +168,8 @@ h1 {
 /* ============================================
    BARRA LATERAL (sidebar)
    ============================================ */
-body {
-    display: flex;
-    min-height: 100vh;
-    margin: 0;
+html, body {
+    height: 100%;
 }
 
 .barra-lateral {
@@ -233,4 +238,5 @@ body {
     flex-grow: 1;
     padding: 2.5rem 3rem;
     overflow-y: auto;
+    height: 100vh;   /* opcional pero ayuda a ser explícito */
 }
