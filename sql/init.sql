@@ -579,4 +579,15 @@ VALUES
                         ' Aumentar',
                         ' El crecimiento constante indica una creciente demanda y una mejor reputación.'
                         );
-                        
+
+
+INSERT INTO USUARIOS 
+(usuario, password_hash )
+VALUES
+('admin','\$2b\$12\$Tv4.xxi0qVZPSGSVNjFvUOzXA2O1Kw7wJtvAYYlHU9UZwzdjholbm');
+
+
+ALTER TABLE instrumento_procesado
+ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id);
+
+docker exec -it aprende_postgres psql -U aprende -d aprende_rag -c "ALTER TABLE instrumento_procesado ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id);"

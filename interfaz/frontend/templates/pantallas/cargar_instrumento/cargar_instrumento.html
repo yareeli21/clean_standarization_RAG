@@ -4,35 +4,90 @@
 <h1>Cargar instrumento</h1>
 <p class="subtitulo">Registra un instrumento nuevo para su limpieza y estandarización</p>
 
-{% if mensaje %}
-<div class="tarjeta" style="color: {{ 'var(--color-azul-petroleo)' if ok else '#c0392b' }}; font-weight: 600;">
-    {{ mensaje }}
-</div>
-{% endif %}
+<div class="layout-cargar">
+    <div class="columna-formulario">
+        {% if mensaje %}
+        {% set color_mensaje = 'var(--color-azul-petroleo)' if ok else '#c0392b' %}
+        <div class="tarjeta" style="color: {{ color_mensaje }}; font-weight: 600;">
+            {{ mensaje }}
+        </div>
+        {% endif %}
 
-<div class="tarjeta tarjeta-formulario">
-    <form method="post" action="/cargar" enctype="multipart/form-data">
-        <label class="etiqueta-campo">Nombre del instrumento</label>
-        <input class="campo" type="text" name="nombre" placeholder="Encuesta de clima escolar 2025" required>
+        <div class="tarjeta tarjeta-formulario">
+            <form method="post" action="/cargar" enctype="multipart/form-data">
+                <label class="etiqueta-campo">Nombre del instrumento</label>
+                <input class="campo" type="text" name="nombre" placeholder="Encuesta de clima escolar 2025" required>
 
-        <label class="etiqueta-campo">Tipo de instrumento</label>
-        <select class="campo" name="tipo" required>
-            <option value="" disabled selected>Selecciona un tipo</option>
-            <option value="Encuesta">Encuesta</option>
-            <option value="Entrevista">Entrevista</option>
-            <option value="Prueba estandarizada">Prueba estandarizada</option>
-        </select>
+                <label class="etiqueta-campo">Tipo de instrumento</label>
+                <select class="campo" name="tipo" required>
+                    <option value="" disabled selected>Selecciona un tipo</option>
+                    <option value="Encuesta">Encuesta</option>
+                    <option value="Entrevista">Entrevista</option>
+                    <option value="Prueba estandarizada">Prueba estandarizada</option>
+                </select>
 
-        <label class="etiqueta-campo">Archivo</label>
-        <input class="campo" type="file" name="archivo" required>
+                <label class="etiqueta-campo">Archivo</label>
+                <input class="campo" type="file" name="archivo" required>
 
-        <button class="boton" type="submit">Cargar instrumento</button>
-    </form>
+                <button class="boton" type="submit" style="width: 100%;">Cargar instrumento</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="columna-consulta">
+        <div class="panel-verde">
+            <div class="panel-cabecera">
+                <h3>Datasets originales</h3>
+                <p class="panel-subtitulo">Consulta lo que ya se ha cargado al sistema</p>
+            </div>
+
+            <div class="filtros-dataset">
+                <select id="filtro-tipo-dataset" class="filtro-select">
+                    <option value="todos">Todos los tipos</option>
+                    <option value="encuesta">Encuestas</option>
+                    <option value="entrevista">Entrevistas</option>
+                    <option value="prueba estandarizada">Pruebas estandarizadas</option>
+                </select>
+                <input type="date" id="filtro-fecha-dataset" class="filtro-select">
+            </div>
+
+            <div id="contenedor-datasets">
+                {% include "pantallas/cargar_instrumento/_datasets_originales.html" %}
+            </div>
+        </div>
+
+        <div class="panel-verde">
+            <div class="panel-cabecera">
+                <h3>Tus instrumentos cargados</h3>
+                <p class="panel-subtitulo">Lo que has subido con tu cuenta</p>
+            </div>
+
+            <div class="lista-datasets">
+                {% for instrumento in mis_instrumentos %}
+                <article class="tarjeta-dataset">
+                    <span class="pill-tipo">{{ instrumento.plataforma or "Instrumento" }}</span>
+                    <h4 class="dataset-nombre">{{ instrumento.nombre }}</h4>
+                    <span class="dataset-fecha">{{ instrumento.fecha_procesamiento.strftime('%d/%m/%Y') if instrumento.fecha_procesamiento else '' }}</span>
+                    <span class="pill-estado">{{ instrumento.estado }}</span>
+                </article>
+                {% else %}
+                <p class="datasets-vacio">Aún no has cargado ningún instrumento.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block css_extra %}
 <style>
+    .layout-cargar {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
     .tarjeta-formulario { max-width: 480px; }
     .etiqueta-campo {
         display: block;
@@ -41,5 +96,116 @@
         color: var(--color-azul-petroleo);
         margin-bottom: 0.35rem;
     }
+
+    .columna-consulta {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .panel-verde {
+        background-color: var(--color-azul-cielo);
+        border-radius: 18px;
+        padding: 1.5rem;
+    }
+
+    .panel-cabecera h3 {
+        margin: 0 0 0.15rem 0;
+        color: var(--color-texto-claro);
+        font-size: 1.15rem;
+    }
+    .panel-subtitulo {
+        margin: 0 0 1rem 0;
+        font-size: 0.8rem;
+        color: var(--color-texto-claro);
+        opacity: 0.85;
+    }
+
+    .filtros-dataset {
+        display: flex;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+    }
+    .filtro-select {
+        flex: 1;
+        padding: 0.5rem 0.65rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.85rem;
+        background: rgba(255,255,255,0.9);
+        color: var(--color-texto-oscuro);
+    }
+
+    .lista-datasets {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .tarjeta-dataset {
+        background: #fff;
+        border-radius: 10px;
+        padding: 0.75rem 0.9rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        position: relative;
+    }
+    .dataset-nombre { margin: 0; font-size: 0.92rem; color: var(--color-azul-petroleo); }
+    .dataset-fecha { font-size: 0.72rem; opacity: 0.6; }
+
+    .pill-tipo {
+        align-self: flex-start;
+        background: var(--color-rosa-claro);
+        color: var(--color-azul-petroleo);
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+    }
+    .pill-estado {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.9rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--color-azul-cielo);
+        text-transform: capitalize;
+    }
+
+    .datasets-vacio {
+        font-size: 0.85rem;
+        color: var(--color-texto-claro);
+        opacity: 0.85;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    @media (max-width: 900px) {
+        .layout-cargar { grid-template-columns: 1fr; }
+    }
 </style>
+{% endblock %}
+
+{% block js_extra %}
+<script>
+(function () {
+    const filtroTipo = document.getElementById('filtro-tipo-dataset');
+    const filtroFecha = document.getElementById('filtro-fecha-dataset');
+    const contenedor = document.getElementById('contenedor-datasets');
+
+    async function actualizarDatasets() {
+        const tipo = encodeURIComponent(filtroTipo.value);
+        const fecha = encodeURIComponent(filtroFecha.value);
+        const respuesta = await fetch(`/cargar/datasets?tipo=${tipo}&fecha=${fecha}`);
+        if (!respuesta.ok) return;
+        contenedor.innerHTML = await respuesta.text();
+    }
+
+    filtroTipo.addEventListener('change', actualizarDatasets);
+    filtroFecha.addEventListener('change', actualizarDatasets);
+})();
+</script>
 {% endblock %}
