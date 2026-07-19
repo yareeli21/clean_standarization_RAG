@@ -590,4 +590,3 @@ VALUES
 ALTER TABLE instrumento_procesado
 ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id);
 
-docker exec -it aprende_postgres psql -U aprende -d aprende_rag -c "ALTER TABLE instrumento_procesado ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id);"
