@@ -26,6 +26,8 @@
   --sombra-suave: 0 2px 8px rgba(12, 59, 46, 0.15);
 
   --fuente-base: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --fuente-kpis: 'San Francisco', Helvetica, Arial, san-serif;
+
 }
 
 * {
@@ -38,7 +40,7 @@ body {
   margin: 0;
   overflow: hidden;   /* evita el scroll del body completo */
   margin: 0;
-  font-family: var(--fuente-base);
+  font-family: var(--fuente-kpis);
   background-color: var(--color-rosa-claro);
   color: var(--color-texto-oscuro);
 }
@@ -240,3 +242,34 @@ html, body {
     overflow-y: auto;
     height: 100vh;   /* opcional pero ayuda a ser explícito */
 }
+
+/* ============================================
+   KPIS DASHBOARD 
+   ============================================ */
+
+.main-stats-grid { 
+    display: grid; 
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem; 
+  }
+
+.tarjeta-dashboardd {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--sombra-suave);
+  margin-bottom: 1rem;
+}
+
+.kpi-title{
+  display: inline-block;
+  background-color: var(--color-azul-cielo);
+  color: var(--color-texto-claro);
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+
+}
+
+

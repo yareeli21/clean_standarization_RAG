@@ -23,24 +23,21 @@ CREATE TABLE IF NOT EXISTS instrumento_procesado (
 -- -- GRUPO 2: Catalogo de indicadores ------------------------
 
 CREATE TABLE IF NOT EXISTS kpi (
-    id           SERIAL PRIMARY KEY,
-    nombre       VARCHAR(255) NOT NULL,
-    descripcion  TEXT,
-    objetivo     TEXT,
-    razon        TEXT,
-    formula      TEXT,
-    umbral_bajo  NUMERIC,
-    umbral_medio NUMERIC,
-    umbral_alto  NUMERIC,
-    unidad       VARCHAR(50),
-    activo       BOOLEAN DEFAULT TRUE
+    id_kpi                  SERIAL PRIMARY KEY,
+    nombrekpi               VARCHAR(255) NOT NULL,
+    descripcion             TEXT,
+    direccion_deseada       TEXT,
+    razon                   TEXT,
+    formula                 TEXT,
+    umbral_bajo             NUMERIC,
+    umbral_medio            NUMERIC,
+    umbral_alto             NUMERIC,
+    unidad                  VARCHAR(50),
+    activo                  BOOLEAN DEFAULT TRUE
 );
 
-
-
-
-CREATE TABLE IF NOT EXISTS pregunta_kpi (
-    id               SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS instituciones (
+    id_institucion              SERIAL PRIMARY KEY,
     instrumento_id   INTEGER REFERENCES instrumento_procesado(id),
     kpi_id           INTEGER REFERENCES kpi(id),
     id_variable      VARCHAR(50),
@@ -49,6 +46,46 @@ CREATE TABLE IF NOT EXISTS pregunta_kpi (
     -- confianza del LLM en la asignacion (0.000 a 1.000)
     fecha            TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS pregunta_kpi (
+    id_pregunta              SERIAL PRIMARY KEY,
+    instrumento_id   INTEGER REFERENCES instrumento_procesado(id),
+    kpi_id           INTEGER REFERENCES kpi(id),
+    id_variable      VARCHAR(50),
+    -- identificador de la pregunta en el instrumento (ej. P_01)
+    score_inferencia NUMERIC(4,3),
+    -- confianza del LLM en la asignacion (0.000 a 1.000)
+    fecha            TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS kpi_variable (
+    id_kpi	INT,
+    id_variable	INT,
+    FOREIGN KEY (id_kpi) REFERENCES kpi(id_kpi),
+    FOREIGN KEY (id_variable) REFERENCES variable(id_variable)
+);
+
+
+CREATE TABLE IF NOT EXISTS variable (
+    id_variable	        SERIAL PRIMARY KEY,
+    nombre_variable	    VARCHAR(512),
+    nombre_display	    VARCHAR(512),
+    unidad	            VARCHAR(512),
+    tipo_dato	        VARCHAR(512)
+);
+
+CREATE TABLE IF NOT EXISTS valor_variable{
+    id_valor            SERIAL PRIMARY KEY,
+    id_variable         INT,
+    id_institucion      INT,
+    periodo             VARCHAR(10) NOT NULL,
+    valor               INT,
+    fecha_registro      TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (id_variable) REFERENCES variable(id_variable),
+    FOREIGN KEY (id_institucion) REFERENCES institucion(id_institucion)
+
+}
+
 
 -- -- GRUPO 3: Catalogo de prompts ----------------------------
 
@@ -102,483 +139,281 @@ CREATE TABLE usuarios (
 
 -- -- DATOS INICIALES: KPIS BY ADMINISTRATOR(LAYLA) -----------------------
 
-INSERT INTO kpi
-(nombre, descripcion, objetivo, razon)
-VALUES
-(
-                        ' Estado de acreditación y clasificaciones',
-                        ' El número y el estatus de las acreditaciones, así como la posición que ocupa una institución en las distintas clasificaciones educativas, pueden ser un indicador significativo de su reputación y calidad.',
-                        ' Aumentar',
-                        ' Una mejor clasificación y un mayor número de acreditaciones mejoran la reputación y la credibilidad.'
-                        ),
-                        (
-                        ' Selectividad de admisión',
-                        ' El porcentaje de solicitantes admitidos puede ser un indicador de la reputación y el atractivo de una institución. Una tasa de admisión más baja suele indicar una mayor selectividad.',
-                        ' Quédese abajo',
-                        ' Una menor tasa de admisión indica una mayor selectividad y prestigio.'
-                        ),
-                        (
-                        ' Tasa de donaciones de exalumnos',
-                        ' Para las instituciones de educación superior, la tasa de donaciones de los exalumnos puede ser un indicador de satisfacción mucho después de la graduación y, a menudo, constituye un componente fundamental de los ingresos de la institución.',
-                        ' Aumentar',
-                        ' Una tasa más alta sugiere satisfacción de los exalumnos y apoyo institucional a largo plazo.'
-                        ),
-                        (
-                        ' Tasas de asistencia',
-                        ' Los índices de asistencia pueden ser un indicador temprano del compromiso y la satisfacción de los estudiantes, y también pueden correlacionarse con el éxito académico.',
-                        ' Aumentar',
-                        'Una mayor asistencia demuestra la implicación y el compromiso de los estudiantes.'
-                        ),
-                        (
-                        ' Tamaño promedio de la clase',
-                        ' Este indicador clave de rendimiento (KPI) mide el número promedio de estudiantes por clase, lo que puede indicar el nivel de atención individual que recibe cada estudiante.',
-                        ' Quédese abajo',
-                        ' Las clases con menos alumnos mejoran la interacción entre estudiantes y profesores, así como la calidad del aprendizaje.'
-                        ),
-                        (
-                        ' Costo promedio de la matrícula',
-                        ' El costo promedio de la matrícula puede indicar la posición de mercado del proveedor educativo. Unas tarifas más altas pueden significar una posición de prestigio, pero también pueden limitar el número potencial de estudiantes.',
-                        ' Quédese abajo',
-                        ' Una matrícula más baja mejora la accesibilidad y la competitividad.'
-                        ),
-                        (
-                        ' Promedio de años para graduarse',
-                        ' El tiempo promedio que tarda un estudiante en completar su curso puede indicar la dificultad del programa, su flexibilidad y la capacidad de la institución para facilitar la graduación a tiempo.',
-                        ' Disminuir a',
-                        ' Reducir la duración de los periodos de graduación mejora la eficiencia y reduce los costes para los estudiantes.'
-                        ),
-                        (
-                        ' Resultados de las pruebas de referencia',
-                        'Las puntuaciones medias de los estudiantes en pruebas de referencia como el SAT, el ACT, el GMAT, etc., pueden indicar la capacidad académica del alumnado.',
-                        ' Aumentar',
-                        ' Las puntuaciones más altas indican un mejor rendimiento académico y una mejor preparación.'
-                        ),
-                        (
-                        ' Estadísticas de seguridad en el campus',
-                        ' Las medidas de seguridad en el campus, como la tasa de delincuencia, pueden ser un indicador fundamental del bienestar estudiantil y pueden afectar la reputación de una institución.',
-                        ' Quédese abajo',
-                        ' Unos índices de delincuencia más bajos crean un entorno de aprendizaje más seguro.'
-                        ),
-                        (
-                        ' Relación entre consejero y estudiante',
-                        ' Este indicador clave de rendimiento (KPI) en las escuelas, especialmente en el nivel de secundaria, puede indicar el nivel de apoyo disponible para los estudiantes en lo que respecta a la planificación académica, las solicitudes de ingreso a la universidad y los problemas socioemocionales.',
-                        ' Quédese abajo',
-                        ' Una menor proporción de alumnos por alumno garantiza un mejor apoyo y orientación para los estudiantes.'
-                        ),
-                        (
-                        ' Tasa de finalización de cursos (educación en línea)',
-                        ' Al igual que la tasa de abandono, este indicador clave de rendimiento (KPI) es especialmente relevante para los proveedores de educación en línea. Mide el porcentaje de estudiantes que completan un curso en línea en comparación con el número total de estudiantes matriculados.',
-                        ' Aumentar',
-                        'Una tasa más alta refleja la participación de los estudiantes y la eficacia del programa.'
-                        ),
-                        (
-                        ' Índice de matriculación/finalización de cursos',
-                        ' El número de estudiantes que completan un curso en comparación con los que se inscribieron. Un índice alto podría indicar que el contenido del curso es atractivo, el nivel de dificultad es adecuado y el curso aporta valor a los estudiantes.',
-                        ' Aumentar',
-                        ' Un índice alto indica un contenido del curso eficaz y una buena perseverancia por parte de los estudiantes.'
-                        ),
-                        (
-                        ' Tasas de impago de préstamos estudiantiles',
-                        ' Una tasa más baja indica que los graduados de la institución suelen ser financieramente estables después de graduarse, lo que repercute positivamente en el valor de la educación recibida.',
-                        ' Disminuir a',
-                        ' Las bajas tasas de impago reflejan la estabilidad financiera de los graduados.'
-                        ),
-                        (
-                        ' Métricas de diversidad',
-                        ' Los indicadores de diversidad de estudiantes y profesorado, como la raza, el género, la nacionalidad, etc., pueden reflejar la inclusividad de una institución y su atractivo para un amplio espectro demográfico.',
-                        ' Aumentar',
-                        ' Una mayor diversidad fomenta la inclusión y un entorno de aprendizaje más enriquecedor.'
-                        ),
-                        (
-                        ' Tasa de abandono',
-                        'Esta métrica representa el porcentaje de estudiantes que abandonan el programa antes de finalizarlo. Una alta tasa de abandono podría indicar insatisfacción con el programa, dificultades con los cursos u otros problemas institucionales.',
-                        ' Disminuir a',
-                        ' Un menor índice de abandono escolar indica una mejor retención y apoyo a los estudiantes.'
-                        ),
-                        (
-                        ' Tamaño de la dotación',
-                        ' Para muchas instituciones de educación superior, el tamaño de su patrimonio puede ser un indicador clave de su salud financiera y sostenibilidad.',
-                        ' Aumentar',
-                        ' Un mayor patrimonio fortalece la sostenibilidad financiera.'
-                        ),
-                        (
-                        ' Actividades extracurriculares',
-                        ' El número y la variedad de actividades extracurriculares disponibles para los estudiantes pueden indicar el compromiso de la institución con la educación integral y la participación estudiantil.',
-                        ' Aumentar',
-                        ' Una mayor variedad de actividades mejora la vida estudiantil y fomenta la participación.'
-                        ),
-                        (
-                        ' Tasa de publicación del profesorado',
-                        'Para las instituciones de educación superior e investigación, la frecuencia con la que los miembros del profesorado publican artículos de investigación en revistas de prestigio puede ser una medida importante del rigor académico y el enfoque de investigación de la institución.',
-                        ' Aumentar',
-                        ' Un mayor número de publicaciones mejora la reputación de la institución en materia de investigación.'
-                        ),
-                        (
-                        ' Cualificación del profesorado y tasa de rotación',
-                        ' La calidad del profesorado desempeña un papel fundamental en el éxito de cualquier institución educativa. Una menor rotación de personal, junto con una mayor cualificación del profesorado, puede ser un indicador de la buena salud de la institución.',
-                        ' Aumentar / Disminuir a',
-                        ' Una mayor cualificación mejora la calidad de la enseñanza; una menor rotación de personal garantiza la estabilidad.'
-                        ),
-                        (
-                        ' Resultados de la investigación del profesorado',
-                        ' La cantidad y la calidad de los artículos académicos y otros resultados de investigación del profesorado pueden indicar el calibre intelectual y el prestigio de una institución, particularmente en la educación superior.',
-                        ' Aumentar',
-                        ' Una mayor producción científica mejora el prestigio institucional.'
-                        ),
-                        (
-                        ' Tasa de graduación',
-                        'El porcentaje de estudiantes que completan sus estudios en un plazo determinado. Una alta tasa de graduación puede indicar un plan de estudios sólido y métodos de enseñanza eficaces.',
-                        ' Aumentar',
-                        ' Una tasa más alta refleja la eficacia del programa y el éxito de los estudiantes.'
-                        ),
-                        (
-                        ' Colaboraciones con la industria y oportunidades de prácticas profesionales',
-                        ' El número de acuerdos de colaboración con la industria y de prácticas profesionales puede indicar las oportunidades prácticas que se ofrecen a los estudiantes y la integración de la institución con el sector industrial.',
-                        ' Aumentar',
-                        ' Un mayor número de colaboraciones mejora la preparación para el empleo y las conexiones con la industria.'
-                        ),
-                        (
-                        ' Gasto en instrucción por estudiante equivalente a tiempo completo (ETC)',
-                        ' Este indicador clave de rendimiento (KPI) permite comprender cuánto invierte una institución en sus servicios de enseñanza por estudiante, lo que puede ser una señal de la calidad educativa.',
-                        ' Aumentar',
-                        ' Un mayor gasto por alumno indica una mejor asignación de recursos.'
-                        ),
-                        (
-                        ' Tasa de colocación laboral',
-                        'Para muchas instituciones educativas, especialmente las de formación profesional y superior, un indicador clave de éxito es el porcentaje de graduados que consiguen empleo en su campo de estudio dentro de un plazo determinado después de graduarse.',
-                        ' Aumentar',
-                        ' Los mayores índices de colocación laboral reflejan el éxito profesional de los graduados.'
-                        ),
-                        (
-                        ' Métricas de participación del alumno (para plataformas en línea)',
-                        ' Esto podría incluir medidas como la duración promedio de la sesión, la tasa de rebote, las páginas por sesión, etc. Un mayor nivel de interacción suele ser una señal positiva.',
-                        ' Aumentar',
-                        ' Una mayor participación se traduce en una mejor experiencia de aprendizaje.'
-                        ),
-                        (
-                        ' Recursos de la biblioteca',
-                        ' La cantidad y la calidad de los recursos disponibles en la biblioteca de la institución, incluidos libros, artículos de investigación y recursos digitales, pueden ser un indicador del apoyo a la excelencia académica.',
-                        ' Aumentar',
-                        ' Una biblioteca con una colección más rica favorece el éxito académico.'
-                        ),
-                        (
-                        ' Valor de por vida de un estudiante',
-                        ' Este indicador clave de rendimiento (KPI) ayuda a comprender los ingresos totales que genera un estudiante promedio a lo largo de su relación con la institución.',
-                        ' Aumentar',
-                        'Un mayor valor mejora la salud financiera institucional.'
-                        ),
-                        (
-                        ' Número de programas acreditados',
-                        ' El número de programas que han sido acreditados por los organismos pertinentes puede ser un indicador de la calidad de la institución y de su adhesión a los estándares académicos.',
-                        ' Aumentar',
-                        ' Un mayor número de programas acreditados aumenta la credibilidad.'
-                        ),
-                        (
-                        ' Número de cursos/programas ofrecidos',
-                        ' La variedad de programas educativos que ofrece una institución puede ser un indicio de su adaptabilidad y de su capacidad para atender a un alumnado diverso.',
-                        ' Aumentar',
-                        ' La diversidad de la oferta académica atrae a más estudiantes.'
-                        ),
-                        (
-                        ' Relación entre la matrícula en línea y la matrícula presencial',
-                        ' Ante la creciente tendencia del aprendizaje digital, especialmente tras la pandemia de Covid-19, es importante analizar la capacidad de la empresa para atraer y retener a estudiantes en línea.',
-                        ' Aumentar',
-                        ' El creciente número de inscripciones en línea refleja adaptabilidad y alcance.'
-                        ),
-                        (
-                        ' Acuerdos de asociación',
-                        'Este indicador clave de rendimiento (KPI) mide la cantidad de acuerdos que una institución educativa tiene con otras instituciones o empresas. Esto puede ser un signo de reconocimiento y demanda de los servicios que ofrece la institución.',
-                        ' Aumentar',
-                        ' Un mayor número de acuerdos fomenta la colaboración y mejora la reputación.'
-                        ),
-                        (
-                        ' Tasa de aprobación de los exámenes de certificación',
-                        ' Para las instituciones que ofrecen cursos que conducen a certificaciones profesionales, el índice de aprobados puede ser una medida significativa de la eficacia de sus programas.',
-                        ' Mantenerse arriba',
-                        ' Un índice de aprobación consistentemente alto indica la eficacia del programa.'
-                        ),
-                        (
-                        ' Patentes concedidas',
-                        ' Para las instituciones de investigación, el número de patentes concedidas es una medida importante de su productividad investigadora y su capacidad de innovación.',
-                        ' Aumentar',
-                        ' Un mayor número de patentes pone de relieve la innovación y el impacto de la investigación.'
-                        ),
-                        (
-                        ' Porcentaje de profesorado con título de posgrado',
-                        ' Este indicador clave de rendimiento (KPI) muestra la proporción de profesores con el título más alto en su campo (como un doctorado). Un porcentaje más alto puede ser un indicador de la calidad del profesorado.',
-                        ' Aumentar',
-                        'Un profesorado más cualificado mejora la calidad académica.'
-                        ),
-                        (
-                        ' Porcentaje de estudiantes a tiempo parcial',
-                        ' La proporción de estudiantes que estudian a tiempo parcial puede ofrecer información valiosa sobre la flexibilidad de los programas de la institución y la composición demográfica de su alumnado.',
-                        ' Quédese abajo',
-                        ' Un porcentaje menor puede indicar una preferencia por la dedicación a tiempo completo.'
-                        ),
-                        (
-                        ' Porcentaje de estudiantes que reciben ayuda financiera',
-                        ' Esto puede indicar la accesibilidad de la institución para estudiantes de diversos estratos socioeconómicos.',
-                        ' Aumentar',
-                        ' Una mayor ayuda mejora el acceso y la asequibilidad.'
-                        ),
-                        (
-                        ' Tasa de estudios de posgrado',
-                        ' La tasa de graduados que continúan sus estudios. Este puede ser un indicador clave para las instituciones que ofrecen programas preuniversitarios o de formación básica.',
-                        ' Aumentar',
-                        ' Una tasa más alta indica un sólido progreso académico.'
-                        ),
-                        (
-                        ' Oportunidades de desarrollo profesional para el profesorado',
-                        'El grado de oportunidades para el desarrollo profesional del profesorado, como años sabáticos, conferencias, becas de investigación, etc., puede indicar la calidad y la satisfacción del profesorado, lo que afecta indirectamente a los resultados de los estudiantes.',
-                        ' Aumentar',
-                        ' Ofrecer más oportunidades mejora el desarrollo y la retención del profesorado.'
-                        ),
-                        (
-                        ' Tasa de incidentes disciplinarios',
-                        ' Este indicador clave de rendimiento (KPI) mide el número de incidentes disciplinarios reportados en relación con el total del alumnado. Un índice elevado puede indicar problemas con la cultura o la gestión del campus.',
-                        ' Disminuir a',
-                        ' Un menor número de incidentes indica un entorno más seguro en el campus.'
-                        ),
-                        (
-                        ' Proporción de estudiantes nacionales e internacionales',
-                        ' Este indicador clave de rendimiento (KPI) muestra la capacidad de una institución para atraer estudiantes extranjeros, lo que puede diversificar las fuentes de ingresos y mejorar la reputación de la institución.',
-                        ' Balance',
-                        ' Una combinación equilibrada garantiza la diversidad y la competitividad global.'
-                        ),
-                        (
-                        ' Financiación y subvenciones para la investigación',
-                        'Este indicador clave de rendimiento (KPI), de particular importancia para la educación superior, representa la cantidad de financiación que una institución recibe para la investigación. Indica la capacidad investigadora y la reputación de la institución.',
-                        ' Aumentar',
-                        ' Una mayor financiación fortalece las capacidades de investigación.'
-                        ),
-                        (
-                        ' Ingresos procedentes de la formación continua',
-                        ' Para las instituciones que ofrecen formación continua, los ingresos derivados de estos programas pueden ser un indicador de su capacidad para atraer y satisfacer las necesidades de los estudiantes no tradicionales o de aquellos que buscan formación a lo largo de toda la vida.',
-                        ' Aumentar',
-                        ' Un mayor nivel de ingresos refleja una demanda de aprendizaje permanente.'
-                        ),
-                        (
-                        ' Ingresos por licencias y patentes',
-                        ' Para las universidades centradas en la investigación, los ingresos derivados de la concesión de licencias de los resultados de la investigación o de las patentes pueden ser una fuente de ingresos importante y un indicador de la solidez investigadora de la institución.',
-                        ' Aumentar',
-                        ' Unos mayores ingresos favorecen la comercialización de la investigación.'
-                        ),
-                        (
-                        ' Ingresos por estudiante',
-                        'Esto indica el ingreso promedio generado por cada estudiante. Ayuda a evaluar la efectividad de la estrategia de precios de una empresa y el valor general que los estudiantes obtienen de los servicios educativos.',
-                        ' Aumentar',
-                        ' Un valor más alto indica eficiencia financiera.'
-                        ),
-                        (
-                        ' Número de estudiantes matriculados',
-                        ' Esto representa el número de estudiantes matriculados en una institución o programa. Es un indicador clave de la demanda de los productos o servicios de una empresa y tiene un impacto directo en su potencial de ingresos.',
-                        ' Aumentar',
-                        ' Un mayor número de estudiantes indica crecimiento institucional y demanda.'
-                        ),
-                        (
-                        ' Disponibilidad de alojamiento para estudiantes',
-                        ' En las instituciones tradicionales con campus, el número de estudiantes que pueden alojarse en las residencias universitarias puede indicar la capacidad de la institución y su habilidad para atraer estudiantes residentes.',
-                        ' Aumentar',
-                        ' Más opciones de vivienda facilitan la vida estudiantil en el campus.'
-                        ),
-                        (
-                        ' Uso de los servicios de salud mental estudiantil',
-                        'La frecuencia con la que los estudiantes utilizan los servicios de salud mental puede ofrecer información valiosa sobre el bienestar del alumnado y la eficacia de los servicios de apoyo de la institución.',
-                        ' Balance',
-                        ' Un uso moderado garantiza que los servicios estén disponibles, pero sin sobrecargarlos.'
-                        ),
-                        (
-                        ' Tasa de retención estudiantil',
-                        ' El porcentaje de estudiantes que se renuevan de un semestre a otro. Una alta tasa de retención puede indicar la capacidad de una empresa para brindar una educación de calidad y una buena satisfacción estudiantil, lo que puede generar una sólida reputación y un aumento en la matrícula futura.',
-                        ' Mantenerse arriba',
-                        ' Una alta tasa de retención refleja una gran satisfacción estudiantil.'
-                        ),
-                        (
-                        ' Índices de satisfacción estudiantil',
-                        ' Estas puntuaciones, que suelen obtenerse mediante encuestas, miden la satisfacción general de los estudiantes con su experiencia educativa. Esto puede abarcar aspectos como el contenido de los cursos, la calidad de la enseñanza, los servicios de apoyo y las instalaciones del campus.',
-                        ' Mantenerse arriba',
-                        ' Las puntuaciones altas indican experiencias positivas por parte de los estudiantes.'
-                        ),
-                        (
-                        ' Servicios de apoyo estudiantil',
-                        'La variedad y la calidad de los servicios de apoyo al estudiante, como la orientación profesional, las tutorías, los servicios de salud mental, etc., pueden ser un indicador importante de la satisfacción estudiantil y del apoyo institucional en general.',
-                        ' Aumentar',
-                        ' Una mayor oferta de servicios mejora el éxito académico y el bienestar de los estudiantes.'
-                        ),
-                        (
-                        ' Relación alumno-profesor',
-                        ' Esta métrica permite evaluar la calidad de la educación impartida. Un índice menor puede significar una atención más personalizada para los estudiantes, lo que se traduce en mejores resultados de aprendizaje.',
-                        ' Quédese abajo',
-                        ' Una menor proporción de alumnos por clase mejora la atención individual de cada estudiante.'
-                        ),
-                        (
-                        ' Tasa de participación en programas de estudios en el extranjero',
-                        ' El índice de participación de los estudiantes en programas de estudios en el extranjero puede ser un indicador de las alianzas globales de la institución y de la amplitud de su experiencia educativa.',
-                        ' Aumentar',
-                        ' Una mayor participación refleja oportunidades de aprendizaje a nivel global.'
-                        ),
-                        (
-                        ' Tipos de transferencia',
-                        ' Para los colegios comunitarios e instituciones similares, un indicador clave de éxito es la tasa de estudiantes que se transfieren a instituciones de cuatro años.',
-                        ' Disminuir a',
-                        'Las tasas más bajas sugieren que los estudiantes están completando sus programas en sus instituciones de origen.'
-                        ),
-                        (
-                        ' Uso de analítica del aprendizaje',
-                        ' El grado en que una institución utiliza datos y análisis para mejorar la enseñanza y el aprendizaje puede ser un indicador de su innovación y dedicación al éxito académico.',
-                        ' Aumentar',
-                        ' Un mayor uso de la analítica mejora la toma de decisiones basada en datos.'
-                        ),
-                        (
-                        ' Crecimiento interanual en las admisiones',
-                        ' Este indicador clave de rendimiento (KPI) mide la variación interanual en las admisiones de nuevos estudiantes. Un crecimiento rápido puede indicar una creciente demanda de la oferta educativa de la empresa.',
-                        ' Aumentar',
-                        ' El crecimiento constante indica una creciente demanda y una mejor reputación.'
-                        ),
-                        (
-                        ' Tasas de asistencia',
-                        ' Los índices de asistencia pueden ser un indicador temprano del compromiso y la satisfacción de los estudiantes, y también pueden correlacionarse con el éxito académico.',
-                        ' Aumentar',
-                        'Una mayor asistencia demuestra la implicación y el compromiso de los estudiantes.'
-                        ),
-                        (
-                        ' Tamaño promedio de la clase',
-                        ' Este indicador clave de rendimiento (KPI) mide el número promedio de estudiantes por clase, lo que puede indicar el nivel de atención individual que recibe cada estudiante.',
-                        ' Quédese abajo',
-                        ' Las clases con menos alumnos mejoran la interacción entre estudiantes y profesores, así como la calidad del aprendizaje.'
-                        ),
-                        (
-                        ' Estadísticas de seguridad en el campus',
-                        ' Las medidas de seguridad en el campus, como la tasa de delincuencia, pueden ser un indicador fundamental del bienestar estudiantil y pueden afectar la reputación de una institución.',
-                        ' Quédese abajo',
-                        ' Unos índices de delincuencia más bajos crean un entorno de aprendizaje más seguro.'
-                        ),
-                        (
-                        ' Índice de matriculación/finalización de cursos',
-                        ' El número de estudiantes que completan un curso en comparación con los que se inscribieron. Un índice alto podría indicar que el contenido del curso es atractivo, el nivel de dificultad es adecuado y el curso aporta valor a los estudiantes.',
-                        ' Aumentar',
-                        ' Un índice alto indica un contenido del curso eficaz y una buena perseverancia por parte de los estudiantes.'
-                        ),
-                        (
-                        ' Métricas de diversidad',
-                        ' Los indicadores de diversidad de estudiantes y profesorado, como la raza, el género, la nacionalidad, etc., pueden reflejar la inclusividad de una institución y su atractivo para un amplio espectro demográfico.',
-                        ' Aumentar',
-                        ' Una mayor diversidad fomenta la inclusión y un entorno de aprendizaje más enriquecedor.'
-                        ),
-                        (
-                        ' Tasa de abandono',
-                        'Esta métrica representa el porcentaje de estudiantes que abandonan el programa antes de finalizarlo. Una alta tasa de abandono podría indicar insatisfacción con el programa, dificultades con los cursos u otros problemas institucionales.',
-                        ' Disminuir a',
-                        ' Un menor índice de abandono escolar indica una mejor retención y apoyo a los estudiantes.'
-                        ),
-                        (
-                        ' Actividades extracurriculares',
-                        ' El número y la variedad de actividades extracurriculares disponibles para los estudiantes pueden indicar el compromiso de la institución con la educación integral y la participación estudiantil.',
-                        ' Aumentar',
-                        ' Una mayor variedad de actividades mejora la vida estudiantil y fomenta la participación.'
-                        ),
-                        (
-                        ' Tasa de graduación',
-                        'El porcentaje de estudiantes que completan sus estudios en un plazo determinado. Una alta tasa de graduación puede indicar un plan de estudios sólido y métodos de enseñanza eficaces.',
-                        ' Aumentar',
-                        ' Una tasa más alta refleja la eficacia del programa y el éxito de los estudiantes.'
-                        ),
-                        (
-                        ' Colaboraciones con la industria y oportunidades de prácticas profesionales',
-                        ' El número de acuerdos de colaboración con la industria y de prácticas profesionales puede indicar las oportunidades prácticas que se ofrecen a los estudiantes y la integración de la institución con el sector industrial.',
-                        ' Aumentar',
-                        ' Un mayor número de colaboraciones mejora la preparación para el empleo y las conexiones con la industria.'
-                        ),
-                        (
-                        ' Tasa de colocación laboral',
-                        'Para muchas instituciones educativas, especialmente las de formación profesional y superior, un indicador clave de éxito es el porcentaje de graduados que consiguen empleo en su campo de estudio dentro de un plazo determinado después de graduarse.',
-                        ' Aumentar',
-                        ' Los mayores índices de colocación laboral reflejan el éxito profesional de los graduados.'
-                        ),
-                        (
-                        ' Recursos de la biblioteca',
-                        ' La cantidad y la calidad de los recursos disponibles en la biblioteca de la institución, incluidos libros, artículos de investigación y recursos digitales, pueden ser un indicador del apoyo a la excelencia académica.',
-                        ' Aumentar',
-                        ' Una biblioteca con una colección más rica favorece el éxito académico.'
-                        ),
-                        (
-                        ' Número de cursos/programas ofrecidos',
-                        ' La variedad de programas educativos que ofrece una institución puede ser un indicio de su adaptabilidad y de su capacidad para atender a un alumnado diverso.',
-                        ' Aumentar',
-                        ' La diversidad de la oferta académica atrae a más estudiantes.'
-                        ),
-                        (
-                        ' Porcentaje de profesorado con título de posgrado',
-                        ' Este indicador clave de rendimiento (KPI) muestra la proporción de profesores con el título más alto en su campo (como un doctorado). Un porcentaje más alto puede ser un indicador de la calidad del profesorado.',
-                        ' Aumentar',
-                        'Un profesorado más cualificado mejora la calidad académica.'
-                        ),
-                        (
-                        ' Porcentaje de estudiantes que reciben ayuda financiera',
-                        ' Esto puede indicar la accesibilidad de la institución para estudiantes de diversos estratos socioeconómicos.',
-                        ' Aumentar',
-                        ' Una mayor ayuda mejora el acceso y la asequibilidad.'
-                        ),
-                        (
-                        ' Tasa de estudios de posgrado',
-                        ' La tasa de graduados que continúan sus estudios. Este puede ser un indicador clave para las instituciones que ofrecen programas preuniversitarios o de formación básica.',
-                        ' Aumentar',
-                        ' Una tasa más alta indica un sólido progreso académico.'
-                        ),
-                        (
-                        ' Oportunidades de desarrollo profesional para el profesorado',
-                        'El grado de oportunidades para el desarrollo profesional del profesorado, como años sabáticos, conferencias, becas de investigación, etc., puede indicar la calidad y la satisfacción del profesorado, lo que afecta indirectamente a los resultados de los estudiantes.',
-                        ' Aumentar',
-                        ' Ofrecer más oportunidades mejora el desarrollo y la retención del profesorado.'
-                        ),
-                        (
-                        ' Tasa de incidentes disciplinarios',
-                        ' Este indicador clave de rendimiento (KPI) mide el número de incidentes disciplinarios reportados en relación con el total del alumnado. Un índice elevado puede indicar problemas con la cultura o la gestión del campus.',
-                        ' Disminuir a',
-                        ' Un menor número de incidentes indica un entorno más seguro en el campus.'
-                        ),
-                        (
-                        ' Proporción de estudiantes nacionales e internacionales',
-                        ' Este indicador clave de rendimiento (KPI) muestra la capacidad de una institución para atraer estudiantes extranjeros, lo que puede diversificar las fuentes de ingresos y mejorar la reputación de la institución.',
-                        ' Balance',
-                        ' Una combinación equilibrada garantiza la diversidad y la competitividad global.'
-                        ),
-                        (
-                        ' Número de estudiantes matriculados',
-                        ' Esto representa el número de estudiantes matriculados en una institución o programa. Es un indicador clave de la demanda de los productos o servicios de una empresa y tiene un impacto directo en su potencial de ingresos.',
-                        ' Aumentar',
-                        ' Un mayor número de estudiantes indica crecimiento institucional y demanda.'
-                        ),
-                        (
-                        ' Uso de los servicios de salud mental estudiantil',
-                        'La frecuencia con la que los estudiantes utilizan los servicios de salud mental puede ofrecer información valiosa sobre el bienestar del alumnado y la eficacia de los servicios de apoyo de la institución.',
-                        ' Balance',
-                        ' Un uso moderado garantiza que los servicios estén disponibles, pero sin sobrecargarlos.'
-                        ),
-                        (
-                        ' Índices de satisfacción estudiantil',
-                        ' Estas puntuaciones, que suelen obtenerse mediante encuestas, miden la satisfacción general de los estudiantes con su experiencia educativa. Esto puede abarcar aspectos como el contenido de los cursos, la calidad de la enseñanza, los servicios de apoyo y las instalaciones del campus.',
-                        ' Mantenerse arriba',
-                        ' Las puntuaciones altas indican experiencias positivas por parte de los estudiantes.'
-                        ),
-                        (
-                        ' Servicios de apoyo estudiantil',
-                        'La variedad y la calidad de los servicios de apoyo al estudiante, como la orientación profesional, las tutorías, los servicios de salud mental, etc., pueden ser un indicador importante de la satisfacción estudiantil y del apoyo institucional en general.',
-                        ' Aumentar',
-                        ' Una mayor oferta de servicios mejora el éxito académico y el bienestar de los estudiantes.'
-                        ),
-                        (
-                        ' Relación alumno-profesor',
-                        ' Esta métrica permite evaluar la calidad de la educación impartida. Un índice menor puede significar una atención más personalizada para los estudiantes, lo que se traduce en mejores resultados de aprendizaje.',
-                        ' Quédese abajo',
-                        ' Una menor proporción de alumnos por clase mejora la atención individual de cada estudiante.'
-                        ),
-                        (
-                        ' Crecimiento interanual en las admisiones',
-                        ' Este indicador clave de rendimiento (KPI) mide la variación interanual en las admisiones de nuevos estudiantes. Un crecimiento rápido puede indicar una creciente demanda de la oferta educativa de la empresa.',
-                        ' Aumentar',
-                        ' El crecimiento constante indica una creciente demanda y una mejor reputación.'
-                        );
+
+INSERT INTO kpi (nombrekpi, descripcion, direccion_deseada, razon, formula) 
+VALUES 
+    ('Estatus de Acreditación y Rankings', 'El número y estatus de las acreditaciones, y la posición de una institución en distintos rankings educativos, puede ser un indicador importante de su reputación y calidad.', 'Aumentar', 'Más acreditaciones vigentes y mejor posición en rankings reflejan mayor reputación y calidad institucional.', 'Tasa_Acreditacion = num_accreditations_activas / num_accreditations_totales, Percentil_Ranking = (1 - (posicion_ranking / total_instituciones_en_ranking)) * 100'),
+    ('Selectividad de Admisión', 'El porcentaje de solicitantes admitidos puede ser señal de la reputación y el atractivo de la institución. Una tasa de admisión más baja suele indicar mayor selectividad.', 'Disminuir', 'Una tasa de admisión más baja generalmente indica mayor selectividad y prestigio percibido.', 'Tasa_Admision (%) = (num_admitidos / num_solicitantes) * 100'),
+    ('Tasa de Donación de Exalumnos', 'En instituciones de educación superior, la tasa a la que los exalumnos donan puede ser indicador de satisfacción a largo plazo y suele ser un componente crítico de los ingresos.', 'Aumentar', 'Una mayor tasa de donación refleja satisfacción sostenida de los exalumnos y fortalece los ingresos institucionales.', 'Tasa_Donacion_Exalumnos (%) = (num_alumni_donantes / num_alumni_totales) * 100'),
+    ('Tasas de Asistencia', 'Las tasas de asistencia pueden ser un indicador temprano del compromiso y satisfacción del estudiante, y también se correlacionan con el éxito académico.', 'Aumentar', 'Mayor asistencia se asocia con mayor compromiso estudiantil y mejores resultados académicos.', 'Tasa_Asistencia (%) = (dias_asistidos_totales / dias_clase_programados_totales) * 100'),
+    ('Tamaño Promedio de Clase', 'Este KPI mide el número promedio de estudiantes por clase, lo cual puede indicar el nivel de atención individual que cada estudiante puede recibir.', 'Disminuir', 'Clases más pequeñas suelen permitir mayor atención individualizada por estudiante.', 'Tamano_Promedio_Clase = num_estudiantes_totales / num_clases_totales'),
+    ('Colegiatura Promedio', 'El costo promedio de la colegiatura puede indicar el posicionamiento de mercado del proveedor educativo. Colegiaturas más altas pueden significar posicionamiento premium, pero también pueden limitar el número de estudiantes potenciales.', 'Monitorear', 'El nivel adecuado depende del posicionamiento estratégico de la institución, no es inherentemente bueno subir o bajar sin contexto.', 'Colegiatura_Promedio = suma_colegiaturas_cobradas / num_estudiantes_totales'),
+    ('Años Promedio hasta Graduación', 'El tiempo promedio que le toma a un estudiante completar su programa puede indicar la dificultad, flexibilidad y la capacidad de la institución para facilitar la graduación oportuna.', 'Disminuir', 'Un menor tiempo promedio hasta la graduación indica mayor eficiencia del programa y de la institución.', 'Anios_Promedio_Graduacion = suma_anios_hasta_graduacion_por_estudiante / num_graduados_totales'),
+    ('Puntajes de Exámenes de Referencia', 'Los puntajes promedio de los estudiantes en exámenes de referencia como SAT, ACT, GMAT, etc., pueden señalar la capacidad académica del cuerpo estudiantil.', 'Aumentar', 'Puntajes más altos reflejan mayor capacidad académica del cuerpo estudiantil.', 'Puntaje_Promedio_Examen = suma_puntajes_examen / num_estudiantes_evaluados'),
+    ('Estadísticas de Seguridad del Campus', 'Las medidas de seguridad del campus, como la tasa de delitos en el campus, pueden ser una medida crítica del bienestar estudiantil y pueden impactar la reputación de la institución.', 'Disminuir', 'Una menor tasa de incidentes de seguridad refleja un campus más seguro para la comunidad estudiantil.', 'Tasa_Delitos_Campus = (num_incidentes_seguridad / poblacion_campus_total) * 1000'),
+    ('Razón de Consejeros por Estudiante', 'Este KPI en escuelas, especialmente a nivel bachillerato, puede indicar el nivel de apoyo disponible para los estudiantes en planeación académica, solicitudes universitarias y temas socioemocionales.', 'Disminuir', 'Una razón más baja (menos estudiantes por consejero) implica mayor disponibilidad de apoyo individual.', 'Razon_Consejero_Estudiante = num_estudiantes_totales / num_consejeros'),
+    ('Tasa de Finalización de Cursos (Educación en Línea)', 'Similar a la tasa de deserción, este KPI es particularmente relevante para proveedores de educación en línea. Mide el porcentaje de estudiantes que completan un curso en línea respecto al total de inscritos.', 'Aumentar', 'Una mayor tasa de finalización indica mejor diseño y efectividad del curso en línea.', 'Tasa_Finalizacion_Online (%) = (num_estudiantes_que_completan_curso_online / num_estudiantes_inscritos_curso_online) * 100'),
+    ('Razón de Inscripción a Finalización de Curso', 'El número de estudiantes que completan un curso comparado con los que se inscribieron. Una razón alta podría indicar que el contenido del curso es atractivo, el nivel de dificultad es apropiado y el curso aporta valor a los estudiantes.', 'Aumentar', 'Una razón más alta indica un curso más atractivo, con dificultad apropiada y de mayor valor percibido.', 'Razon_Inscripcion_Finalizacion = num_estudiantes_completan_curso / num_estudiantes_inscritos_curso'),
+    ('Tasas de Incumplimiento en Préstamos Estudiantiles', 'Una tasa más baja indica que los egresados de la institución generalmente son financieramente estables tras graduarse, lo cual refleja positivamente el valor de la educación recibida.', 'Disminuir', 'Una menor tasa de incumplimiento refleja mejor estabilidad financiera de los egresados y mayor valor percibido de la educación.', 'Tasa_Incumplimiento_Prestamos (%) = (num_prestamos_en_default / num_prestamos_totales_otorgados) * 100'),
+    ('Métricas de Diversidad', 'Las medidas de diversidad estudiantil y docente, incluyendo raza, género, nacionalidad, etc., pueden indicar la inclusividad de la institución y su atractivo para una demografía amplia.', 'Aumentar', 'Mayor diversidad refleja inclusividad institucional y mayor atractivo para una demografía amplia.', 'Proporcion_Diversidad_X (%) = (num_estudiantes_grupo_demografico_x / num_estudiantes_totales) * 100, Indice_Diversidad = num_grupos_demograficos_representados / num_estudiantes_totales'),
+    ('Tasa de Deserción', 'Esta métrica representa el porcentaje de estudiantes que abandonan el programa antes de completarlo. Una tasa alta podría indicar insatisfacción con el programa, dificultad de los cursos u otros problemas institucionales.', 'Disminuir', 'Una menor tasa de deserción indica mayor satisfacción y menor cantidad de problemas institucionales o académicos.', 'Tasa_Desercion (%) = (num_estudiantes_que_abandonan / num_estudiantes_inscritos_totales) * 100'),
+    ('Tamaño del Fondo Patrimonial (Endowment)', 'Para muchas instituciones de educación superior, el tamaño de su fondo patrimonial puede ser una medida clave de salud financiera y sostenibilidad.', 'Aumentar', 'Un fondo patrimonial más grande refleja mayor salud financiera y sostenibilidad institucional.', 'Fondo_Patrimonial_por_Estudiante = valor_total_fondo_patrimonial / num_estudiantes_totales'),
+    ('Actividades Extracurriculares', 'El número y variedad de actividades extracurriculares disponibles para los estudiantes puede indicar el compromiso de la institución con la educación integral y el involucramiento estudiantil.', 'Aumentar', 'Mayor participación extracurricular refleja mayor compromiso institucional con la formación integral.', 'Tasa_Participacion_Extracurricular (%) = (num_estudiantes_participantes / num_estudiantes_totales) * 100'),
+    ('Tasa de Publicación Docente', 'Para instituciones de educación superior y de investigación, la tasa a la que el profesorado publica artículos de investigación en revistas reconocidas puede ser una medida importante del rigor académico y enfoque de investigación de la institución.', 'Aumentar', 'Una mayor tasa de publicación refleja mayor rigor académico y enfoque en investigación.', 'Tasa_Publicacion_Docente = num_publicaciones_indexadas / num_profesores_investigadores'),
+    ('Calificación del Profesorado y Tasa de Rotación', 'La calidad del profesorado juega un papel crítico en el éxito de cualquier institución educativa. Una menor tasa de rotación junto con mayor calificación docente puede indicar buena salud institucional.', 'Mixto', 'Se busca aumentar la proporción de profesores altamente calificados y, al mismo tiempo, disminuir la rotación docente.', 'Tasa_Calificacion_Docente (%) = (num_profesores_altamente_calificados / num_profesores_totales) * 100, Tasa_Rotacion_Docente (%) = (num_profesores_que_se_van / num_profesores_promedio_periodo) * 100'),
+    ('Producción de Investigación Docente', 'El número y calidad de artículos académicos y otra producción de investigación del profesorado puede indicar el nivel intelectual y el prestigio de una institución, particularmente en educación superior.', 'Aumentar', 'Mayor producción y calidad de investigación docente refleja mayor prestigio institucional.', 'Produccion_Investigacion_por_Docente = num_publicaciones_totales / num_profesores_investigadores, Citas_Promedio_por_Publicacion = num_citas_totales / num_publicaciones_totales'),
+    ('Tasa de Graduación', 'El porcentaje de estudiantes que completan su programa de estudios dentro de un periodo determinado. Una tasa de graduación alta puede señalar un currículo sólido y métodos de enseñanza efectivos.', 'Aumentar', 'Una mayor tasa de graduación refleja un currículo sólido y métodos de enseñanza efectivos.', 'Tasa_Graduacion (%) = (num_estudiantes_graduados_en_periodo / num_estudiantes_cohorte_inicial) * 100'),
+    ('Convenios con la Industria y Oportunidades de Prácticas Profesionales', 'El número de convenios con la industria y de prácticas profesionales puede indicar las oportunidades prácticas para los estudiantes y la integración de la institución con el sector productivo.', 'Aumentar', 'Más convenios y vacantes de prácticas amplían las oportunidades prácticas para los estudiantes.', 'Tasa_Disponibilidad_Practicas (%) = (num_vacantes_practicas_ofrecidas / num_estudiantes_totales) * 100'),
+    ('Gasto Instruccional por Estudiante Equivalente a Tiempo Completo (FTE)', 'Este KPI da información sobre cuánto invierte una institución en sus servicios instruccionales por estudiante, lo cual puede ser señal de calidad educativa.', 'Aumentar', 'Un mayor gasto instruccional por estudiante puede reflejar mayor inversión en calidad educativa.', 'Gasto_Instruccional_por_FTE = gasto_total_instruccional / num_estudiantes_fte'),
+    ('Tasa de Colocación Laboral', 'Para muchas instituciones educativas, especialmente las vocacionales y de nivel superior, una medida crítica de éxito es el porcentaje de egresados que consiguen empleo en su área de estudio dentro de cierto plazo tras graduarse.', 'Aumentar', 'Una mayor tasa de colocación laboral refleja la efectividad de la institución para preparar a sus egresados.', 'Tasa_Colocacion_Laboral (%) = (num_graduados_empleados_en_su_area / num_graduados_totales) * 100'),
+    ('Métricas de Interacción del Aprendiz (Plataformas en Línea)', 'Estas pueden incluir medidas como duración promedio de sesión, tasa de rebote, páginas por sesión, etc. Un mayor nivel de interacción generalmente es una señal positiva.', 'Mixto', 'Se busca aumentar la duración de sesión y las páginas por sesión, y disminuir la tasa de rebote.', 'Duracion_Promedio_Sesion = suma_duracion_sesiones / num_sesiones_totales, Tasa_Rebote (%) = (num_sesiones_una_sola_pagina / num_sesiones_totales) * 100, Paginas_por_Sesion = num_paginas_vistas_totales / num_sesiones_totales'),
+    ('Recursos Bibliotecarios', 'El número y calidad de los recursos disponibles en la biblioteca de la institución, incluyendo libros, artículos de investigación y recursos digitales, puede indicar el apoyo a la excelencia académica.', 'Aumentar', 'Más recursos bibliotecarios por estudiante reflejan mayor apoyo a la excelencia académica.', 'Recursos_Bibliotecarios_por_Estudiante = num_recursos_bibliotecarios_totales / num_estudiantes_totales'),
+    ('Valor de Vida del Estudiante', 'Este KPI ayuda a entender el ingreso total que un estudiante promedio genera a lo largo de su relación con la institución.', 'Aumentar', 'Un mayor valor de vida del estudiante refleja mayor rentabilidad de la relación institución-estudiante.', 'Valor_Vida_Estudiante = ingreso_promedio_anual_por_estudiante * duracion_promedio_relacion_anios'),
+    ('Número de Programas Acreditados', 'El número de programas que han sido acreditados por organismos relevantes puede ser un indicador de la calidad institucional y el cumplimiento de estándares académicos.', 'Aumentar', 'Más programas acreditados reflejan mayor calidad institucional y cumplimiento de estándares académicos.', 'Proporcion_Programas_Acreditados (%) = (num_programas_acreditados / num_programas_totales) * 100'),
+    ('Número de Cursos/Programas Ofrecidos', 'El rango de programas educativos que ofrece una institución puede ser señal de su adaptabilidad y capacidad para atender a un cuerpo estudiantil diverso.', 'Aumentar', 'Una oferta más amplia de programas refleja mayor adaptabilidad institucional.', 'Total_Programas_Ofrecidos = COUNT(num_cursos_o_programas_ofrecidos)'),
+    ('Razón de Matrícula en Línea vs. Presencial', 'Con la creciente tendencia del aprendizaje digital, especialmente tras la pandemia de Covid-19, es importante analizar la capacidad de la institución para atraer y retener estudiantes en línea.', 'Monitorear', 'El balance ideal depende de la estrategia institucional respecto a modalidades en línea y presencial.', 'Razon_Online_Presencial = num_estudiantes_online / num_estudiantes_presenciales'),
+    ('Convenios de Colaboración', 'Este KPI mide el número de convenios que una institución educativa tiene con otras instituciones o empresas. Puede ser señal de reconocimiento y demanda de la oferta de la institución.', 'Aumentar', 'Más convenios de colaboración reflejan mayor reconocimiento y demanda de la oferta institucional.', 'Total_Convenios_Activos = COUNT(num_convenios_activos)'),
+    ('Tasa de Aprobación de Exámenes de Certificación', 'Para instituciones que ofrecen cursos que conducen a certificaciones profesionales, la tasa de aprobación puede ser una medida importante de la efectividad de sus programas.', 'Aumentar', 'Una mayor tasa de aprobación refleja mayor efectividad de los programas de certificación.', 'Tasa_Aprobacion_Certificacion (%) = (num_estudiantes_aprueban_examen / num_estudiantes_presentan_examen) * 100'),
+    ('Patentes Otorgadas', 'Para instituciones de investigación, el número de patentes otorgadas es una medida importante de su productividad de investigación y capacidad de innovación.', 'Aumentar', 'Más patentes otorgadas reflejan mayor productividad de investigación y capacidad de innovación.', 'Patentes_por_Investigador = num_patentes_otorgadas / num_profesores_investigadores'),
+    ('Porcentaje de Profesorado con Grado Terminal', 'Este KPI muestra la proporción de miembros del profesorado con el grado más alto en su campo (como un doctorado). Un porcentaje más alto puede ser indicador de la calidad del profesorado.', 'Aumentar', 'Un mayor porcentaje de doctores en el profesorado refleja mayor calidad docente.', 'Tasa_Grado_Terminal (%) = (num_profesores_con_doctorado / num_profesores_totales) * 100'),
+    ('Porcentaje de Estudiantes de Medio Tiempo', 'La proporción de estudiantes que estudian medio tiempo puede dar información sobre la flexibilidad de los programas de la institución y la demografía de su cuerpo estudiantil.', 'Monitorear', 'El nivel adecuado depende de la estrategia de flexibilidad y del perfil demográfico objetivo de la institución.', 'Tasa_Medio_Tiempo (%) = (num_estudiantes_medio_tiempo / num_estudiantes_totales) * 100'),
+    ('Porcentaje de Estudiantes que Reciben Ayuda Financiera', 'Esto puede indicar la accesibilidad de la institución para estudiantes de diversos contextos económicos.', 'Aumentar', 'Un mayor porcentaje de estudiantes con ayuda financiera refleja mayor accesibilidad económica de la institución.', 'Tasa_Ayuda_Financiera (%) = (num_estudiantes_con_ayuda_financiera / num_estudiantes_totales) * 100'),
+    ('Tasa de Continuación de Estudios de Posgrado', 'La tasa a la que los egresados continúan con más estudios. Puede ser una medida clave para instituciones que ofrecen programas preuniversitarios o fundacionales.', 'Aumentar', 'Una mayor tasa de continuación a posgrado refleja el valor académico percibido del programa previo.', 'Tasa_Continuacion_Posgrado (%) = (num_graduados_continuan_estudios / num_graduados_totales) * 100'),
+    ('Oportunidades de Desarrollo Profesional para el Profesorado', 'El alcance de las oportunidades de desarrollo profesional para el profesorado, como sabáticos, conferencias, becas de investigación, etc., puede indicar la calidad y satisfacción docente, lo cual afecta indirectamente los resultados estudiantiles.', 'Aumentar', 'Mayor participación en desarrollo profesional refleja mayor inversión institucional en la calidad docente.', 'Tasa_Participacion_Desarrollo_Profesional (%) = (num_profesores_participan_en_desarrollo_profesional / num_profesores_totales) * 100'),
+    ('Tasa de Incidentes Disciplinarios', 'Este KPI mide el número de incidentes disciplinarios reportados en relación con el total del cuerpo estudiantil. Tasas más altas pueden sugerir problemas de cultura o gestión del campus.', 'Disminuir', 'Una menor tasa de incidentes disciplinarios refleja mejor cultura institucional y gestión del campus.', 'Tasa_Incidentes_Disciplinarios = (num_incidentes_disciplinarios / num_estudiantes_totales) * 1000'),
+    ('Razón de Estudiantes Nacionales a Internacionales', 'Este KPI indica la capacidad de una institución para atraer estudiantes del extranjero, lo cual puede diversificar las fuentes de ingreso y mejorar la reputación de la institución.', 'Monitorear', 'El balance ideal depende de la estrategia de internacionalización de la institución.', 'Razon_Nacionales_Internacionales = num_estudiantes_nacionales / num_estudiantes_internacionales'),
+    ('Financiamiento y Becas de Investigación', 'Particularmente importante en educación superior, este KPI representa el monto de financiamiento que recibe una institución para investigación. Indica la capacidad de investigación y la reputación de la institución.', 'Aumentar', 'Un mayor financiamiento de investigación refleja mayor capacidad de investigación y reputación institucional.', 'Financiamiento_Investigacion_por_Investigador = monto_total_financiamiento_investigacion / num_profesores_investigadores'),
+    ('Ingresos por Educación Continua', 'Para instituciones que ofrecen educación continua, los ingresos derivados de estos programas pueden ser una medida de su capacidad para atraer y satisfacer las necesidades de estudiantes no tradicionales o de aprendizaje continuo.', 'Aumentar', 'Mayores ingresos por educación continua reflejan mayor capacidad para atender a estudiantes no tradicionales.', 'Proporcion_Ingresos_Educacion_Continua (%) = (ingresos_educacion_continua / ingresos_totales_institucion) * 100'),
+    ('Ingresos por Licenciamiento y Patentes', 'Para universidades intensivas en investigación, los ingresos derivados de licenciar hallazgos de investigación o patentes pueden ser una fuente de ingreso importante y una señal de la fortaleza de investigación de la institución.', 'Aumentar', 'Mayores ingresos por licenciamiento y patentes reflejan mayor fortaleza de investigación institucional.', 'Proporcion_Ingresos_Licenciamiento (%) = (ingresos_licenciamiento_patentes / ingresos_totales_institucion) * 100'),
+    ('Ingreso por Estudiante', 'Esto indica el ingreso promedio generado por cada estudiante. Ayuda a medir la efectividad de la estrategia de precios de la institución y el valor global que los estudiantes obtienen de los servicios educativos.', 'Aumentar', 'Un mayor ingreso por estudiante refleja mayor efectividad de la estrategia de precios y de valor institucional.', 'Ingreso_por_Estudiante = ingresos_totales_institucion / num_estudiantes_totales'),
+    ('Número de Estudiantes Inscritos', 'Esto representa el número de estudiantes inscritos en una institución o programa. Es un indicador crítico de la demanda de la oferta de la institución e impacta directamente el potencial de ingresos.', 'Aumentar', 'Una mayor matrícula refleja mayor demanda de la oferta institucional y mayor potencial de ingresos.', 'Matricula_Total = SUM(num_estudiantes_inscritos)'),
+    ('Disponibilidad de Vivienda Estudiantil', 'Para instituciones tradicionales con campus físico, el número de estudiantes que pueden alojarse en la vivienda del campus puede indicar la capacidad de la institución y su habilidad para atraer estudiantes residentes.', 'Aumentar', 'Mayor disponibilidad de vivienda refleja mayor capacidad institucional para atraer estudiantes residentes.', 'Tasa_Disponibilidad_Vivienda (%) = (num_camas_disponibles_dormitorios / num_estudiantes_totales) * 100'),
+    ('Uso de Servicios de Salud Mental Estudiantil', 'La tasa a la que los estudiantes utilizan servicios de salud mental puede dar información sobre el bienestar del cuerpo estudiantil y la efectividad de los servicios de apoyo de la institución.', 'Monitorear', 'Un aumento puede reflejar tanto mayor necesidad como mejor acceso, se debe interpretar junto con otros indicadores de bienestar.', 'Tasa_Uso_Servicios_Salud_Mental (%) = (num_estudiantes_usan_servicios_salud_mental / num_estudiantes_totales) * 100'),
+    ('Tasa de Retención Estudiantil', 'El porcentaje de estudiantes que se reinscriben periodo tras periodo. Tasas de retención altas pueden señalar la capacidad de la institución para brindar educación de calidad y buena satisfacción estudiantil, lo que puede llevar a una reputación sólida y crecimiento futuro de matrícula.', 'Aumentar', 'Una mayor retención refleja mejor calidad educativa y satisfacción estudiantil.', 'Tasa_Retencion (%) = (num_estudiantes_reinscritos_siguiente_periodo / num_estudiantes_elegibles_reinscripcion) * 100'),
+    ('Puntajes de Satisfacción Estudiantil', 'Estos puntajes, generalmente obtenidos de encuestas, miden la satisfacción general de los estudiantes con su experiencia educativa. Puede cubrir aspectos del contenido del curso, calidad de enseñanza, servicios de apoyo e instalaciones del campus.', 'Aumentar', 'Puntajes de satisfacción más altos reflejan una mejor experiencia educativa integral.', 'Puntaje_Promedio_Satisfaccion = suma_puntajes_encuesta_satisfaccion / num_encuestas_respondidas'),
+    ('Servicios de Apoyo Estudiantil', 'El alcance y calidad de los servicios de apoyo estudiantil, como orientación vocacional, tutorías, servicios de salud mental, etc., puede ser una medida importante de la satisfacción estudiantil y del apoyo institucional general.', 'Aumentar', 'Mayor uso de servicios de apoyo refleja mayor accesibilidad y valor percibido de dichos servicios.', 'Tasa_Utilizacion_Servicios_Apoyo (%) = (num_estudiantes_que_usan_servicios_apoyo / num_estudiantes_totales) * 100'),
+    ('Razón de Estudiantes por Profesor', 'Esta métrica da información sobre la calidad de la educación impartida. Una razón más baja puede significar atención más personalizada para los estudiantes, lo que lleva a mejores resultados de aprendizaje.', 'Disminuir', 'Una razón más baja (menos estudiantes por profesor) permite mayor atención personalizada y mejores resultados de aprendizaje.', 'Razon_Estudiante_Profesor = num_estudiantes_totales / num_profesores_totales'),
+    ('Tasa de Participación en Programas de Intercambio', 'La tasa a la que los estudiantes participan en programas de intercambio puede ser señal de las alianzas globales de la institución y de la amplitud de su experiencia educativa.', 'Aumentar', 'Mayor participación en intercambios refleja mayores alianzas globales y una experiencia educativa más amplia.', 'Tasa_Participacion_Intercambio (%) = (num_estudiantes_en_intercambio / num_estudiantes_totales) * 100'),
+    ('Tasas de Transferencia', 'Para colegios comunitarios e instituciones similares, una medida clave de éxito es la tasa a la que los estudiantes se transfieren a instituciones de cuatro años.', 'Aumentar', 'Una mayor tasa de transferencia refleja la efectividad de la institución para preparar a sus estudiantes hacia estudios de cuatro años.', 'Tasa_Transferencia (%) = (num_estudiantes_transferidos_a_4anios / num_estudiantes_elegibles_transferencia) * 100'),
+    ('Uso de Analítica de Aprendizaje', 'El grado en que una institución utiliza datos y analítica para mejorar la enseñanza y el aprendizaje puede ser señal de su innovación y compromiso con el logro académico.', 'Aumentar', 'Mayor adopción de analítica de aprendizaje refleja mayor innovación institucional y enfoque en el logro académico.', 'Tasa_Adopcion_Analitica_Aprendizaje (%) = (num_cursos_con_analitica_implementada / num_cursos_totales) * 100'),
+    ('Crecimiento Interanual en Admisiones', 'Este KPI mide el cambio interanual en las nuevas admisiones de estudiantes. Un crecimiento rápido puede indicar demanda creciente de la oferta educativa de la institución.', 'Aumentar', 'Un crecimiento interanual positivo refleja demanda creciente de la oferta educativa institucional.', 'Crecimiento_Interanual_Admisiones (%) = ((num_admisiones_anio_actual - num_admisiones_anio_anterior) / num_admisiones_anio_anterior) * 100');
+
+
+INSERT INTO kpi_variable (id_kpi, id_variable) 
+VALUES 
+    ('1', '1'),
+    ('1', '2'),
+    ('1', '3'),
+    ('1', '4'),
+    ('2', '5'),
+    ('2', '6'),
+    ('3', '7'),
+    ('3', '8'),
+    ('4', '9'),
+    ('4', '10'),
+    ('5', '11'),
+    ('5', '12'),
+    ('6', '13'),
+    ('6', '11'),
+    ('7', '14'),
+    ('7', '15'),
+    ('8', '16'),
+    ('8', '17'),
+    ('9', '18'),
+    ('9', '19'),
+    ('10', '11'),
+    ('10', '20'),
+    ('11', '21'),
+    ('11', '22'),
+    ('12', '23'),
+    ('12', '24'),
+    ('13', '25'),
+    ('13', '26'),
+    ('14', '27'),
+    ('14', '11'),
+    ('14', '28'),
+    ('15', '29'),
+    ('15', '30'),
+    ('16', '31'),
+    ('16', '11'),
+    ('17', '33'),
+    ('17', '11'),
+    ('18', '34'),
+    ('18', '35'),
+    ('19', '36'),
+    ('19', '37'),
+    ('19', '38'),
+    ('19', '39'),
+    ('20', '40'),
+    ('20', '41'),
+    ('20', '35'),
+    ('21', '42'),
+    ('21', '43'),
+    ('22', '44'),
+    ('22', '45'),
+    ('22', '11'),
+    ('23', '46'),
+    ('23', '47'),
+    ('24', '48'),
+    ('24', '15'),
+    ('25', '49'),
+    ('25', '50'),
+    ('25', '51'),
+    ('25', '52'),
+    ('26', '53'),
+    ('26', '11'),
+    ('27', '54'),
+    ('27', '55'),
+    ('28', '56'),
+    ('28', '57'),
+    ('29', '58'),
+    ('30', '59'),
+    ('30', '60'),
+    ('31', '61'),
+    ('32', '62'),
+    ('32', '63'),
+    ('33', '64'),
+    ('33', '35'),
+    ('34', '65'),
+    ('34', '37'),
+    ('35', '66'),
+    ('35', '11'),
+    ('36', '67'),
+    ('36', '11'),
+    ('37', '68'),
+    ('37', '15'),
+    ('38', '69'),
+    ('38', '37'),
+    ('39', '70'),
+    ('39', '11'),
+    ('40', '71'),
+    ('40', '72'),
+    ('41', '73'),
+    ('41', '35'),
+    ('42', '74'),
+    ('42', '75'),
+    ('43', '76'),
+    ('43', '75'),
+    ('44', '75'),
+    ('44', '11'),
+    ('45', '77'),
+    ('46', '78'),
+    ('46', '11'),
+    ('47', '79'),
+    ('47', '11'),
+    ('48', '80'),
+    ('48', '81'),
+    ('49', '82'),
+    ('49', '83'),
+    ('50', '84'),
+    ('50', '11'),
+    ('51', '11'),
+    ('51', '37'),
+    ('52', '85'),
+    ('52', '11'),
+    ('53', '86'),
+    ('53', '87'),
+    ('54', '88'),
+    ('54', '89'),
+    ('55', '90'),
+    ('55', '91');
+
+
+INSERT INTO variable (nombre_variable, nombre_display, unidad, tipo_dato) 
+VALUES 
+    ('num_accreditations_activas', 'Número de acreditaciones activas', 'conteo', 'entero'),
+    ('num_accreditations_totales', 'Número de acreditaciones totales', 'conteo', 'entero'),
+    ('posicion_ranking', 'Posición en el ranking', 'posición', 'entero'),
+    ('total_instituciones_en_ranking', 'Total de instituciones en el ranking', 'conteo', 'entero'),
+    ('num_admitidos', 'Número de admitidos', 'conteo', 'entero'),
+    ('num_solicitantes', 'Número de solicitantes', 'conteo', 'entero'),
+    ('num_alumni_donantes', 'Número de exalumnos donantes', 'conteo', 'entero'),
+    ('num_alumni_totales', 'Número de exalumnos totales', 'conteo', 'entero'),
+    ('dias_asistidos_totales', 'Días asistidos totales', 'conteo', 'entero'),
+    ( 'dias_clase_programados_totales', 'Días de clase programados totales', 'conteo', 'entero'),
+    ( 'num_estudiantes_totales', 'Número de estudiantes', 'conteo', 'entero'),
+    ( 'num_clases_totales', 'Número de clases totales', 'conteo', 'entero'),
+    ( 'suma_colegiaturas_cobradas', 'Suma de colegiaturas cobradas', 'moneda', 'decimal'),
+    ( 'suma_anios_hasta_graduacion_por_estudiante', 'Suma de años hasta graduación por estudiante', 'años', 'decimal'),
+    ( 'num_graduados_totales', 'Número de graduados totales', 'conteo', 'entero'),
+    ( 'suma_puntajes_examen', 'Suma de puntajes de examen', 'puntos', 'decimal'),
+    ( 'num_estudiantes_evaluados', 'Número de estudiantes evaluados', 'conteo', 'entero'),
+    ( 'num_incidentes_seguridad', 'Número de incidentes de seguridad', 'conteo', 'entero'),
+    ( 'poblacion_campus_total', 'Población total del campus', 'conteo', 'entero'),
+    ( 'num_consejeros', 'Número de consejeros', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_completan_curso_online', 'Número de estudiantes que completan curso en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_curso_online', 'Número de estudiantes inscritos en curso en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_completan_curso', 'Número de estudiantes que completan el curso', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_curso', 'Número de estudiantes inscritos en el curso', 'conteo', 'entero'),
+    ( 'num_prestamos_en_default', 'Número de préstamos en incumplimiento', 'conteo', 'entero'),
+    ( 'num_prestamos_totales_otorgados', 'Número de préstamos totales otorgados', 'conteo', 'entero'),
+    ( 'num_estudiantes_grupo_demografico_x', 'Número de estudiantes de un grupo demográfico', 'conteo', 'entero'),
+    ( 'num_grupos_demograficos_representados', 'Número de grupos demográficos representados', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_abandonan', 'Número de estudiantes que abandonan', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_totales', 'Número de estudiantes inscritos totales', 'conteo', 'entero'),
+    ( 'valor_total_fondo_patrimonial', 'Valor total del fondo patrimonial (endowment)', 'moneda', 'decimal'),
+    ( 'num_actividades_extracurriculares_ofrecidas', 'Número de actividades extracurriculares ofrecidas', 'conteo', 'entero'),
+    ( 'num_estudiantes_participantes', 'Número de estudiantes participantes', 'conteo', 'entero'),
+    ( 'num_publicaciones_indexadas', 'Número de publicaciones indexadas', 'conteo', 'entero'),
+    ( 'num_profesores_investigadores', 'Número de profesores investigadores', 'conteo', 'entero'),
+    ( 'num_profesores_altamente_calificados', 'Número de profesores altamente calificados', 'conteo', 'entero'),
+    ( 'num_profesores_totales', 'Número de profesores totales', 'conteo', 'entero'),
+    ( 'num_profesores_que_se_van', 'Número de profesores que se van', 'conteo', 'entero'),
+    ( 'num_profesores_promedio_periodo', 'Número promedio de profesores en el periodo', 'conteo', 'decimal'),
+    ( 'num_publicaciones_totales', 'Número de publicaciones totales', 'conteo', 'entero'),
+    ( 'num_citas_totales', 'Número de citas académicas totales', 'conteo', 'entero'),
+    ( 'num_estudiantes_graduados_en_periodo', 'Número de estudiantes graduados en el periodo', 'conteo', 'entero'),
+    ( 'num_estudiantes_cohorte_inicial', 'Número de estudiantes de la cohorte inicial', 'conteo', 'entero'),
+    ( 'num_convenios_industria_activos', 'Número de convenios con la industria activos', 'conteo', 'entero'),
+    ( 'num_vacantes_practicas_ofrecidas', 'Número de vacantes de prácticas ofrecidas', 'conteo', 'entero'),
+    ( 'gasto_total_instruccional', 'Gasto total instruccional', 'moneda', 'decimal'),
+    ( 'num_estudiantes_fte', 'Número de estudiantes equivalentes a tiempo completo (FTE)', 'conteo', 'decimal'),
+    ( 'num_graduados_empleados_en_su_area', 'Número de graduados empleados en su área', 'conteo', 'entero'),
+    ( 'suma_duracion_sesiones', 'Suma de duración de sesiones', 'minutos', 'decimal'),
+    ( 'num_sesiones_totales', 'Número de sesiones totales', 'conteo', 'entero'),
+    ( 'num_sesiones_una_sola_pagina', 'Número de sesiones de una sola página', 'conteo', 'entero'),
+    ( 'num_paginas_vistas_totales', 'Número de páginas vistas totales', 'conteo', 'entero'),
+    ( 'num_recursos_bibliotecarios_totales', 'Número de recursos bibliotecarios totales', 'conteo', 'entero'),
+    ( 'ingreso_promedio_anual_por_estudiante', 'Ingreso promedio anual por estudiante', 'moneda', 'decimal'),
+    ( 'duracion_promedio_relacion_anios', 'Duración promedio de la relación (años)', 'años', 'decimal'),
+    ( 'num_programas_acreditados', 'Número de programas acreditados', 'conteo', 'entero'),
+    ( 'num_programas_totales', 'Número de programas totales', 'conteo', 'entero'),
+    ( 'num_cursos_o_programas_ofrecidos', 'Número de cursos o programas ofrecidos', 'conteo', 'entero'),
+    ( 'num_estudiantes_online', 'Número de estudiantes en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_presenciales', 'Número de estudiantes presenciales', 'conteo', 'entero'),
+    ( 'num_convenios_activos', 'Número de convenios activos', 'conteo', 'entero'),
+    ( 'num_estudiantes_aprueban_examen', 'Número de estudiantes que aprueban el examen', 'conteo', 'entero'),
+    ( 'num_estudiantes_presentan_examen', 'Número de estudiantes que presentan el examen', 'conteo', 'entero'),
+    ( 'num_patentes_otorgadas', 'Número de patentes otorgadas', 'conteo', 'entero'),
+    ( 'num_profesores_con_doctorado', 'Número de profesores con doctorado', 'conteo', 'entero'),
+    ( 'num_estudiantes_medio_tiempo', 'Número de estudiantes de medio tiempo', 'conteo', 'entero'),
+    ( 'num_estudiantes_con_ayuda_financiera', 'Número de estudiantes con ayuda financiera', 'conteo', 'entero'),
+    ( 'num_graduados_continuan_estudios', 'Número de graduados que continúan estudios', 'conteo', 'entero'),
+    ( 'num_profesores_participan_en_desarrollo_profesional', 'Número de profesores que participan en desarrollo profesional', 'conteo', 'entero'),
+    ( 'num_incidentes_disciplinarios', 'Número de incidentes disciplinarios', 'conteo', 'entero'),
+    ( 'num_estudiantes_nacionales', 'Número de estudiantes nacionales', 'conteo', 'entero'),
+    ( 'num_estudiantes_internacionales', 'Número de estudiantes internacionales', 'conteo', 'entero'),
+    ( 'monto_total_financiamiento_investigacion', 'Monto total de financiamiento para investigación', 'moneda', 'decimal'),
+    ( 'ingresos_educacion_continua', 'Ingresos por educación continua', 'moneda', 'decimal'),
+    ( 'ingresos_totales_institucion', 'Ingresos totales de la institución', 'moneda', 'decimal'),
+    ( 'ingresos_licenciamiento_patentes', 'Ingresos por licenciamiento y patentes', 'moneda', 'decimal'),
+    ( 'num_estudiantes_inscritos', 'Número de estudiantes inscritos', 'conteo', 'entero'),
+    ( 'num_camas_disponibles_dormitorios', 'Número de camas disponibles en dormitorios', 'conteo', 'entero'),
+    ( 'num_estudiantes_usan_servicios_salud_mental', 'Número de estudiantes que usan servicios de salud mental', 'conteo', 'entero'),
+    ( 'num_estudiantes_reinscritos_siguiente_periodo', 'Número de estudiantes reinscritos en el siguiente periodo', 'conteo', 'entero'),
+    ( 'num_estudiantes_elegibles_reinscripcion', 'Número de estudiantes elegibles para reinscripción', 'conteo', 'entero'),
+    ( 'suma_puntajes_encuesta_satisfaccion', 'Suma de puntajes de encuesta de satisfacción', 'puntos', 'decimal'),
+    ( 'num_encuestas_respondidas', 'Número de encuestas respondidas', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_usan_servicios_apoyo', 'Número de estudiantes que usan servicios de apoyo', 'conteo', 'entero'),
+    ( 'num_estudiantes_en_intercambio', 'Número de estudiantes en intercambio', 'conteo', 'entero'),
+    ( 'num_estudiantes_transferidos_a_4anios', 'Número de estudiantes transferidos a instituciones de 4 años', 'conteo', 'entero'),
+    ( 'num_estudiantes_elegibles_transferencia', 'Número de estudiantes elegibles para transferencia', 'conteo', 'entero'),
+    ( 'num_cursos_con_analitica_implementada', 'Número de cursos con analítica implementada', 'conteo', 'entero'),
+    ( 'num_cursos_totales', 'Número de cursos totales', 'conteo', 'entero'),
+    ( 'num_admisiones_anio_actual', 'Número de admisiones del año actual', 'conteo', 'entero'),
+    ( 'num_admisiones_anio_anterior', 'Número de admisiones del año anterior', 'conteo', 'entero');
+
+------------------------USUARIO ADMIN----------------------------
                         
 INSERT INTO USUARIOS 
 (usuario, password_hash )

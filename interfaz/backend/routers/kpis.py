@@ -1,14 +1,3 @@
-"""
-Router: Catálogo de KPIs
-
-Responsable de esta pantalla: layla Hernande
-
-Ya conectado a PostgreSQL de verdad: consulta la tabla `kpi`.
-Si la tabla todavía no tiene registros (o la BD ni siquiera está corriendo
-todavía), la pantalla muestra un estado vacío en vez de tronar. En cuanto
-existan filas en `kpi`, solo hay que volver a correr el proyecto
-(python index.py) y aparecerán solas — no se necesita tocar este código.
-"""
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -34,3 +23,14 @@ async def ver_catalogo_kpis(request: Request):
         "pantallas/catalogo_kpis/catalogo_kpis.html",
         {"titulo": "Catálogo de KPIs", "kpis": kpis},
     )
+    
+
+initial_statistics = [0 for i in range(7)]
+
+numero_de_estudiantes = ejecutar_query(
+    
+    """ 
+    SELECT 
+    """
+
+)
