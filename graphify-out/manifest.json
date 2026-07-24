@@ -1,0 +1,212 @@
+{
+  "interfaz/backend/__init__.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "interfaz/backend/core/__init__.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "interfaz/backend/core/config.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "75879498ba6b13ea04cc09e312407823",
+    "semantic_hash": "75879498ba6b13ea04cc09e312407823"
+  },
+  "interfaz/backend/core/db.py": {
+    "mtime": 1784318584.25685,
+    "ast_hash": "7f682ef3d4ff5d6ccd1316c7a45229b4",
+    "semantic_hash": "7f682ef3d4ff5d6ccd1316c7a45229b4"
+  },
+  "interfaz/backend/core/security.py": {
+    "mtime": 1783903501.678003,
+    "ast_hash": "f7083ff024ad9cb87a11c70641eb7b39",
+    "semantic_hash": "f7083ff024ad9cb87a11c70641eb7b39"
+  },
+  "interfaz/backend/main.py": {
+    "mtime": 1784000386.8000188,
+    "ast_hash": "3fdc5d388c53f4ed1dbebc85ff4e6abf",
+    "semantic_hash": "3fdc5d388c53f4ed1dbebc85ff4e6abf"
+  },
+  "interfaz/backend/rag_backend/__init__.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "interfaz/backend/rag_backend/rag_service.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "6779eb1a0fddaeb10696c4f8ffadc9c2",
+    "semantic_hash": "6779eb1a0fddaeb10696c4f8ffadc9c2"
+  },
+  "interfaz/backend/routers/__init__.py": {
+    "mtime": 1783708773.607395,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "interfaz/backend/routers/cargar.py": {
+    "mtime": 1784000386.8036635,
+    "ast_hash": "a571184061a87af15baf4188a7a6d45c",
+    "semantic_hash": "a571184061a87af15baf4188a7a6d45c"
+  },
+  "interfaz/backend/routers/chat.py": {
+    "mtime": 1783708773.6199286,
+    "ast_hash": "1811f0c9a4433d06acdfbb272961b654",
+    "semantic_hash": "1811f0c9a4433d06acdfbb272961b654"
+  },
+  "interfaz/backend/routers/instrumentos.py": {
+    "mtime": 1784000386.8036635,
+    "ast_hash": "fc412b5575d19fc097cc9fe7580a996b",
+    "semantic_hash": "fc412b5575d19fc097cc9fe7580a996b"
+  },
+  "interfaz/backend/routers/kpis.py": {
+    "mtime": 1784696615.706881,
+    "ast_hash": "a40e7216e95e7a47cc365baa083dafb3",
+    "semantic_hash": "a40e7216e95e7a47cc365baa083dafb3"
+  },
+  "interfaz/backend/routers/login.py": {
+    "mtime": 1784000671.694432,
+    "ast_hash": "b28fc11ab54fe0b4999d8e10e0085f93",
+    "semantic_hash": "b28fc11ab54fe0b4999d8e10e0085f93"
+  },
+  "interfaz/backend/schemas/__init__.py": {
+    "mtime": 1783708773.6228602,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "interfaz/backend/scripts/crear_usuario.py": {
+    "mtime": 1783904231.608644,
+    "ast_hash": "2b484812c78d2028ea3e55f6aea68155",
+    "semantic_hash": "2b484812c78d2028ea3e55f6aea68155"
+  },
+  "interfaz/frontend/static/js/base.js": {
+    "mtime": 1783708773.623752,
+    "ast_hash": "cb895f1d11854e11c2ce2c10ede6e740",
+    "semantic_hash": "cb895f1d11854e11c2ce2c10ede6e740"
+  },
+  "interfaz/index.py": {
+    "mtime": 1784000386.9307296,
+    "ast_hash": "701cecb0f2e87aacb7c760ff6d53ba2e",
+    "semantic_hash": "701cecb0f2e87aacb7c760ff6d53ba2e"
+  },
+  "pruebas/__init__.py": {
+    "mtime": 1783708773.623752,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/__init__.py": {
+    "mtime": 1783708773.623752,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/estandarizacion/__init__.py": {
+    "mtime": 1783708773.623752,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/estandarizacion/encuestas/__init__.py": {
+    "mtime": 1783708773.623752,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/estandarizacion/entrevistas/__init__.py": {
+    "mtime": 1783708773.6394904,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/estandarizacion/pruebas_estandarizadas/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/estandarizacion/router.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/asistida.py": {
+    "mtime": 1784000386.9307296,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/exportar.py": {
+    "mtime": 1784000386.9307296,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/ingesta.py": {
+    "mtime": 1784000386.9307296,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/llm.py": {
+    "mtime": 1784000386.9307296,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/metricas.py": {
+    "mtime": 1784000386.946421,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/pipeline.py": {
+    "mtime": 1784000386.946421,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/plataforma.py": {
+    "mtime": 1784000386.946421,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/encuestas/transformaciones.py": {
+    "mtime": 1784000386.946421,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/entrevistas/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/limpieza_encuesta.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "0e36528af1ac63e959bdf62e94489bd2",
+    "semantic_hash": "0e36528af1ac63e959bdf62e94489bd2"
+  },
+  "recursos/limpieza/pruebas_estandarizadas/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/limpieza/router.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/rag/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "recursos/vectorizacion/__init__.py": {
+    "mtime": 1783708773.640486,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "sql/init.sql": {
+    "mtime": 1784696425.514563,
+    "ast_hash": "1b11ec962156bf5f58751ced6f4251bd",
+    "semantic_hash": "1b11ec962156bf5f58751ced6f4251bd"
+  }
+}

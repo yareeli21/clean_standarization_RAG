@@ -1,0 +1,351 @@
+{
+  "communities": {
+    "0": [
+      "recursos_limpieza_limpieza_encuesta",
+      "recursos_limpieza_limpieza_encuesta_calcular_calidad",
+      "recursos_limpieza_limpieza_encuesta_capitalizacion_controlada",
+      "recursos_limpieza_limpieza_encuesta_construir_perfil_para_llm",
+      "recursos_limpieza_limpieza_encuesta_detectar_plataforma",
+      "recursos_limpieza_limpieza_encuesta_es_num",
+      "recursos_limpieza_limpieza_encuesta_exportar",
+      "recursos_limpieza_limpieza_encuesta_fase_asistida",
+      "recursos_limpieza_limpieza_encuesta_fase_automatica",
+      "recursos_limpieza_limpieza_encuesta_generar_alertas",
+      "recursos_limpieza_limpieza_encuesta_generar_casos_asistidos_llm",
+      "recursos_limpieza_limpieza_encuesta_inferir_tipo",
+      "recursos_limpieza_limpieza_encuesta_main",
+      "recursos_limpieza_limpieza_encuesta_normalizar_raiz",
+      "recursos_limpieza_limpieza_encuesta_normalizar_texto_basico",
+      "recursos_limpieza_limpieza_encuesta_pedir",
+      "recursos_limpieza_limpieza_encuesta_rationale_205",
+      "recursos_limpieza_limpieza_encuesta_rationale_229",
+      "recursos_limpieza_limpieza_encuesta_rationale_578",
+      "recursos_limpieza_limpieza_encuesta_rationale_649",
+      "recursos_limpieza_limpieza_encuesta_rationale_67",
+      "recursos_limpieza_limpieza_encuesta_rationale_811",
+      "recursos_limpieza_limpieza_encuesta_rationale_86",
+      "recursos_limpieza_limpieza_encuesta_rationale_917",
+      "recursos_limpieza_limpieza_encuesta_registrar_transformacion",
+      "recursos_limpieza_limpieza_encuesta_revisar_columnas"
+    ],
+    "1": [
+      "interfaz_backend_core_config",
+      "interfaz_backend_core_config_rationale_1",
+      "interfaz_backend_main",
+      "interfaz_backend_main_rationale_1",
+      "interfaz_backend_routers_init",
+      "interfaz_backend_routers_instrumentos",
+      "interfaz_backend_routers_instrumentos_buscar_instrumentos",
+      "interfaz_backend_routers_instrumentos_obtener_instrumentos",
+      "interfaz_backend_routers_instrumentos_preparar_instrumentos",
+      "interfaz_backend_routers_instrumentos_py_request",
+      "interfaz_backend_routers_instrumentos_rationale_1",
+      "interfaz_backend_routers_instrumentos_rationale_28",
+      "interfaz_backend_routers_instrumentos_rationale_79",
+      "interfaz_backend_routers_instrumentos_ver_catalogo_instrumentos"
+    ],
+    "2": [
+      "interfaz_backend_core_db",
+      "interfaz_backend_core_db_ejecutar_query",
+      "interfaz_backend_core_db_obtener_conexion",
+      "interfaz_backend_core_db_rationale_24",
+      "interfaz_backend_core_db_rationale_29",
+      "interfaz_backend_core_security_verificar_password",
+      "interfaz_backend_routers_kpis",
+      "interfaz_backend_routers_kpis_py_request",
+      "interfaz_backend_routers_kpis_ver_catalogo_kpis",
+      "interfaz_backend_routers_login",
+      "interfaz_backend_routers_login_procesar_login",
+      "interfaz_backend_routers_login_py_request",
+      "interfaz_backend_routers_login_ver_login"
+    ],
+    "3": [
+      "interfaz_backend_core_db_ejecutar_comando",
+      "interfaz_backend_core_db_rationale_47",
+      "interfaz_backend_core_security",
+      "interfaz_backend_core_security_hashear_password",
+      "interfaz_backend_routers_cargar",
+      "interfaz_backend_routers_cargar_procesar_carga",
+      "interfaz_backend_routers_cargar_py_request",
+      "interfaz_backend_routers_cargar_rationale_1",
+      "interfaz_backend_routers_cargar_ver_formulario_carga",
+      "interfaz_backend_scripts_crear_usuario",
+      "interfaz_backend_scripts_crear_usuario_crear_usuario",
+      "uploadfile"
+    ],
+    "4": [
+      "basemodel",
+      "interfaz_backend_routers_chat",
+      "interfaz_backend_routers_chat_consultar_rag",
+      "interfaz_backend_routers_chat_consultarequest",
+      "interfaz_backend_routers_chat_py_request",
+      "interfaz_backend_routers_chat_rationale_1",
+      "interfaz_backend_routers_chat_rationale_37",
+      "interfaz_backend_routers_chat_ver_chat_ia"
+    ],
+    "5": [
+      "recursos_limpieza_limpieza_encuesta_cargar",
+      "recursos_limpieza_limpieza_encuesta_leer_csv",
+      "recursos_limpieza_limpieza_encuesta_leer_excel",
+      "recursos_limpieza_limpieza_encuesta_limpiar_nombre_col",
+      "recursos_limpieza_limpieza_encuesta_rationale_112",
+      "recursos_limpieza_limpieza_encuesta_rationale_134",
+      "recursos_limpieza_limpieza_encuesta_rationale_186"
+    ],
+    "6": [
+      "interfaz_index",
+      "interfaz_index_abrir_navegador",
+      "interfaz_index_rationale_1",
+      "interfaz_index_rationale_22"
+    ],
+    "7": [
+      "interfaz_backend_rag_backend_rag_service",
+      "interfaz_backend_rag_backend_rag_service_consultar",
+      "interfaz_backend_rag_backend_rag_service_rationale_1"
+    ],
+    "8": [
+      "interfaz_backend_core_init"
+    ],
+    "9": [
+      "interfaz_backend_init"
+    ],
+    "10": [
+      "interfaz_backend_rag_backend_init"
+    ],
+    "11": [
+      "interfaz_backend_schemas_init"
+    ],
+    "12": [
+      "interfaz_frontend_static_js_base"
+    ],
+    "13": [
+      "pruebas_init"
+    ],
+    "14": [
+      "recursos_estandarizacion_encuestas_init"
+    ],
+    "15": [
+      "recursos_estandarizacion_entrevistas_init"
+    ],
+    "16": [
+      "recursos_estandarizacion_init"
+    ],
+    "17": [
+      "recursos_estandarizacion_pruebas_estandarizadas_init"
+    ],
+    "18": [
+      "recursos_estandarizacion_router"
+    ],
+    "19": [
+      "recursos_init"
+    ],
+    "20": [
+      "recursos_limpieza_encuestas_asistida"
+    ],
+    "21": [
+      "recursos_limpieza_encuestas_exportar"
+    ],
+    "22": [
+      "recursos_limpieza_encuestas_ingesta"
+    ],
+    "23": [
+      "recursos_limpieza_encuestas_init"
+    ],
+    "24": [
+      "recursos_limpieza_encuestas_llm"
+    ],
+    "25": [
+      "recursos_limpieza_encuestas_metricas"
+    ],
+    "26": [
+      "recursos_limpieza_encuestas_pipeline"
+    ],
+    "27": [
+      "recursos_limpieza_encuestas_plataforma"
+    ],
+    "28": [
+      "recursos_limpieza_encuestas_transformaciones"
+    ],
+    "29": [
+      "recursos_limpieza_entrevistas_init"
+    ],
+    "30": [
+      "recursos_limpieza_init"
+    ],
+    "31": [
+      "recursos_limpieza_pruebas_estandarizadas_init"
+    ],
+    "32": [
+      "recursos_limpieza_router"
+    ],
+    "33": [
+      "recursos_rag_init"
+    ],
+    "34": [
+      "recursos_vectorizacion_init"
+    ]
+  },
+  "cohesion": {
+    "0": 0.12,
+    "1": 0.1978021978021978,
+    "2": 0.23076923076923078,
+    "3": 0.24242424242424243,
+    "4": 0.2857142857142857,
+    "5": 0.3333333333333333,
+    "6": 0.5,
+    "7": 0.6666666666666666,
+    "8": 1.0,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0
+  },
+  "gods": [
+    {
+      "id": "interfaz_backend_core_db_ejecutar_query",
+      "label": "ejecutar_query()",
+      "degree": 8
+    },
+    {
+      "id": "recursos_limpieza_limpieza_encuesta_fase_automatica",
+      "label": "fase_automatica()",
+      "degree": 8
+    },
+    {
+      "id": "recursos_limpieza_limpieza_encuesta_main",
+      "label": "main()",
+      "degree": 8
+    },
+    {
+      "id": "interfaz_backend_core_db_ejecutar_comando",
+      "label": "ejecutar_comando()",
+      "degree": 6
+    },
+    {
+      "id": "interfaz_backend_routers_instrumentos_obtener_instrumentos",
+      "label": "_obtener_instrumentos()",
+      "degree": 5
+    },
+    {
+      "id": "recursos_limpieza_limpieza_encuesta_cargar",
+      "label": "cargar()",
+      "degree": 5
+    },
+    {
+      "id": "recursos_limpieza_limpieza_encuesta_fase_asistida",
+      "label": "fase_asistida()",
+      "degree": 5
+    },
+    {
+      "id": "interfaz_backend_routers_cargar_procesar_carga",
+      "label": "procesar_carga()",
+      "degree": 4
+    },
+    {
+      "id": "interfaz_backend_routers_instrumentos_buscar_instrumentos",
+      "label": "buscar_instrumentos()",
+      "degree": 4
+    },
+    {
+      "id": "interfaz_backend_routers_login_procesar_login",
+      "label": "procesar_login()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "_obtener_instrumentos()",
+      "target": "ejecutar_query()",
+      "source_files": [
+        "interfaz/backend/routers/instrumentos.py",
+        "interfaz/backend/core/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "ver_catalogo_kpis()",
+      "target": "ejecutar_query()",
+      "source_files": [
+        "interfaz/backend/routers/kpis.py",
+        "interfaz/backend/core/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "procesar_login()",
+      "target": "ejecutar_query()",
+      "source_files": [
+        "interfaz/backend/routers/login.py",
+        "interfaz/backend/core/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "procesar_carga()",
+      "target": "ejecutar_comando()",
+      "source_files": [
+        "interfaz/backend/routers/cargar.py",
+        "interfaz/backend/core/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "crear_usuario()",
+      "target": "ejecutar_comando()",
+      "source_files": [
+        "interfaz/backend/scripts/crear_usuario.py",
+        "interfaz/backend/core/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `ejecutar_query()` connect `db.py` to `instrumentos.py`?",
+      "why": "High betweenness centrality (0.022) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ejecutar_comando()` connect `cargar.py` to `db.py`?",
+      "why": "High betweenness centrality (0.017) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `limpieza_encuesta.py` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.12 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

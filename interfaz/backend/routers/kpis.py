@@ -13,9 +13,9 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 async def ver_catalogo_kpis(request: Request):
     kpis = ejecutar_query(
         """
-        SELECT  id, nombre, descripcion, objetivo, razon 
+        SELECT  id_kpi, nombrekpi, descripcion, direccion_deseada, razon 
         FROM kpi
-        ORDER BY nombre;
+        ORDER BY nombrekpi;
         """
     )
     return templates.TemplateResponse(
@@ -24,13 +24,3 @@ async def ver_catalogo_kpis(request: Request):
         {"titulo": "Catálogo de KPIs", "kpis": kpis},
     )
     
-
-initial_statistics = [0 for i in range(7)]
-
-numero_de_estudiantes = ejecutar_query(
-    
-    """ 
-    SELECT 
-    """
-
-)

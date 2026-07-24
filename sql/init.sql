@@ -7,7 +7,7 @@
 -- -- GRUPO 1: Gestion de instrumentos ------------------------
 
 CREATE TABLE IF NOT EXISTS instrumento_procesado (
-    id                  SERIAL PRIMARY KEY,
+    id_instrumento                  SERIAL PRIMARY KEY,
     nombre              VARCHAR(255) NOT NULL,
     plataforma          VARCHAR(100),
     ruta_crudo          TEXT,
@@ -37,25 +37,27 @@ CREATE TABLE IF NOT EXISTS kpi (
 );
 
 CREATE TABLE IF NOT EXISTS instituciones (
-    id_institucion              SERIAL PRIMARY KEY,
-    instrumento_id   INTEGER REFERENCES instrumento_procesado(id),
-    kpi_id           INTEGER REFERENCES kpi(id),
-    id_variable      VARCHAR(50),
-    -- identificador de la pregunta en el instrumento (ej. P_01)
-    score_inferencia NUMERIC(4,3),
-    -- confianza del LLM en la asignacion (0.000 a 1.000)
-    fecha            TIMESTAMP DEFAULT NOW()
+    id_institucion    SERIAL PRIMARY KEY,
+    nombre            TEXT,
+    pais              TEXT,
+    fecha             TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS pregunta_kpi (
-    id_pregunta              SERIAL PRIMARY KEY,
-    instrumento_id   INTEGER REFERENCES instrumento_procesado(id),
-    kpi_id           INTEGER REFERENCES kpi(id),
-    id_variable      VARCHAR(50),
-    -- identificador de la pregunta en el instrumento (ej. P_01)
-    score_inferencia NUMERIC(4,3),
-    -- confianza del LLM en la asignacion (0.000 a 1.000)
-    fecha            TIMESTAMP DEFAULT NOW()
+    id_pregunta             SERIAL PRIMARY KEY,
+    instrumento_id          INTEGER REFERENCES instrumento_procesado(id_instrumento),
+    kpi_id                  INTEGER REFERENCES kpi(id_kpi),
+    id_variable             VARCHAR(50), -- identificador de la pregunta en el instrumento (ej. P_01)
+    score_inferencia        NUMERIC(4,3),-- confianza del LLM en la asignacion (0.000 a 1.000)
+    fecha                   TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS variable (
+    id_variable	        SERIAL PRIMARY KEY,
+    nombre_variable	    VARCHAR(512),
+    nombre_display	    VARCHAR(512),
+    unidad	            VARCHAR(512),
+    tipo_dato	        VARCHAR(512)
 );
 
 CREATE TABLE IF NOT EXISTS kpi_variable (
@@ -66,15 +68,9 @@ CREATE TABLE IF NOT EXISTS kpi_variable (
 );
 
 
-CREATE TABLE IF NOT EXISTS variable (
-    id_variable	        SERIAL PRIMARY KEY,
-    nombre_variable	    VARCHAR(512),
-    nombre_display	    VARCHAR(512),
-    unidad	            VARCHAR(512),
-    tipo_dato	        VARCHAR(512)
-);
 
-CREATE TABLE IF NOT EXISTS valor_variable{
+
+CREATE TABLE IF NOT EXISTS valor_variable(
     id_valor            SERIAL PRIMARY KEY,
     id_variable         INT,
     id_institucion      INT,
@@ -82,19 +78,18 @@ CREATE TABLE IF NOT EXISTS valor_variable{
     valor               INT,
     fecha_registro      TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (id_variable) REFERENCES variable(id_variable),
-    FOREIGN KEY (id_institucion) REFERENCES institucion(id_institucion)
+    FOREIGN KEY (id_institucion) REFERENCES instituciones(id_institucion)
 
-}
+);
 
 
 -- -- GRUPO 3: Catalogo de prompts ----------------------------
 
 CREATE TABLE IF NOT EXISTS prompt (
     id        SERIAL PRIMARY KEY,
-    tipo      VARCHAR(100) NOT NULL,
-    -- chunking, metadatos, kpi_inferencia, query, contextualizacion
-    version   VARCHAR(20),
-    contenido TEXT NOT NULL,
+    tipo      VARCHAR(100) NOT NULL,-- chunking, metadatos, kpi_inferencia, query, contextualizacion
+    version_   VARCHAR(20),
+   contenido TEXT NOT NULL,
     fecha     TIMESTAMP DEFAULT NOW(),
     activo    BOOLEAN DEFAULT TRUE
 );
@@ -103,7 +98,7 @@ CREATE TABLE IF NOT EXISTS prompt (
 
 CREATE TABLE IF NOT EXISTS documento_vectorizado (
     id                  SERIAL PRIMARY KEY,
-    instrumento_id      INTEGER REFERENCES instrumento_procesado(id),
+    instrumento_id      INTEGER REFERENCES instrumento_procesado(id_instrumento),
     prompt_id           INTEGER REFERENCES prompt(id),
     -- version del prompt que genero este chunk
     vector_id           VARCHAR(255),
@@ -198,6 +193,100 @@ VALUES
     ('Uso de Analítica de Aprendizaje', 'El grado en que una institución utiliza datos y analítica para mejorar la enseñanza y el aprendizaje puede ser señal de su innovación y compromiso con el logro académico.', 'Aumentar', 'Mayor adopción de analítica de aprendizaje refleja mayor innovación institucional y enfoque en el logro académico.', 'Tasa_Adopcion_Analitica_Aprendizaje (%) = (num_cursos_con_analitica_implementada / num_cursos_totales) * 100'),
     ('Crecimiento Interanual en Admisiones', 'Este KPI mide el cambio interanual en las nuevas admisiones de estudiantes. Un crecimiento rápido puede indicar demanda creciente de la oferta educativa de la institución.', 'Aumentar', 'Un crecimiento interanual positivo refleja demanda creciente de la oferta educativa institucional.', 'Crecimiento_Interanual_Admisiones (%) = ((num_admisiones_anio_actual - num_admisiones_anio_anterior) / num_admisiones_anio_anterior) * 100');
 
+
+INSERT INTO variable (nombre_variable, nombre_display, unidad, tipo_dato) 
+VALUES 
+    ('num_accreditations_activas', 'Número de acreditaciones activas', 'conteo', 'entero'),
+    ('num_accreditations_totales', 'Número de acreditaciones totales', 'conteo', 'entero'),
+    ('posicion_ranking', 'Posición en el ranking', 'posición', 'entero'),
+    ('total_instituciones_en_ranking', 'Total de instituciones en el ranking', 'conteo', 'entero'),
+    ('num_admitidos', 'Número de admitidos', 'conteo', 'entero'),
+    ('num_solicitantes', 'Número de solicitantes', 'conteo', 'entero'),
+    ('num_alumni_donantes', 'Número de exalumnos donantes', 'conteo', 'entero'),
+    ('num_alumni_totales', 'Número de exalumnos totales', 'conteo', 'entero'),
+    ('dias_asistidos_totales', 'Días asistidos totales', 'conteo', 'entero'),
+    ( 'dias_clase_programados_totales', 'Días de clase programados totales', 'conteo', 'entero'),
+    ( 'num_estudiantes_totales', 'Número de estudiantes', 'conteo', 'entero'),
+    ( 'num_clases_totales', 'Número de clases totales', 'conteo', 'entero'),
+    ( 'suma_colegiaturas_cobradas', 'Suma de colegiaturas cobradas', 'moneda', 'decimal'),
+    ( 'suma_anios_hasta_graduacion_por_estudiante', 'Suma de años hasta graduación por estudiante', 'años', 'decimal'),
+    ( 'num_graduados_totales', 'Número de graduados totales', 'conteo', 'entero'),
+    ( 'suma_puntajes_examen', 'Suma de puntajes de examen', 'puntos', 'decimal'),
+    ( 'num_estudiantes_evaluados', 'Número de estudiantes evaluados', 'conteo', 'entero'),
+    ( 'num_incidentes_seguridad', 'Número de incidentes de seguridad', 'conteo', 'entero'),
+    ( 'poblacion_campus_total', 'Población total del campus', 'conteo', 'entero'),
+    ( 'num_consejeros', 'Número de consejeros', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_completan_curso_online', 'Número de estudiantes que completan curso en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_curso_online', 'Número de estudiantes inscritos en curso en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_completan_curso', 'Número de estudiantes que completan el curso', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_curso', 'Número de estudiantes inscritos en el curso', 'conteo', 'entero'),
+    ( 'num_prestamos_en_default', 'Número de préstamos en incumplimiento', 'conteo', 'entero'),
+    ( 'num_prestamos_totales_otorgados', 'Número de préstamos totales otorgados', 'conteo', 'entero'),
+    ( 'num_estudiantes_grupo_demografico_x', 'Número de estudiantes de un grupo demográfico', 'conteo', 'entero'),
+    ( 'num_grupos_demograficos_representados', 'Número de grupos demográficos representados', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_abandonan', 'Número de estudiantes que abandonan', 'conteo', 'entero'),
+    ( 'num_estudiantes_inscritos_totales', 'Número de estudiantes inscritos totales', 'conteo', 'entero'),
+    ( 'valor_total_fondo_patrimonial', 'Valor total del fondo patrimonial (endowment)', 'moneda', 'decimal'),
+    ( 'num_actividades_extracurriculares_ofrecidas', 'Número de actividades extracurriculares ofrecidas', 'conteo', 'entero'),
+    ( 'num_estudiantes_participantes', 'Número de estudiantes participantes', 'conteo', 'entero'),
+    ( 'num_publicaciones_indexadas', 'Número de publicaciones indexadas', 'conteo', 'entero'),
+    ( 'num_profesores_investigadores', 'Número de profesores investigadores', 'conteo', 'entero'),
+    ( 'num_profesores_altamente_calificados', 'Número de profesores altamente calificados', 'conteo', 'entero'),
+    ( 'num_profesores_totales', 'Número de profesores totales', 'conteo', 'entero'),
+    ( 'num_profesores_que_se_van', 'Número de profesores que se van', 'conteo', 'entero'),
+    ( 'num_profesores_promedio_periodo', 'Número promedio de profesores en el periodo', 'conteo', 'decimal'),
+    ( 'num_publicaciones_totales', 'Número de publicaciones totales', 'conteo', 'entero'),
+    ( 'num_citas_totales', 'Número de citas académicas totales', 'conteo', 'entero'),
+    ( 'num_estudiantes_graduados_en_periodo', 'Número de estudiantes graduados en el periodo', 'conteo', 'entero'),
+    ( 'num_estudiantes_cohorte_inicial', 'Número de estudiantes de la cohorte inicial', 'conteo', 'entero'),
+    ( 'num_convenios_industria_activos', 'Número de convenios con la industria activos', 'conteo', 'entero'),
+    ( 'num_vacantes_practicas_ofrecidas', 'Número de vacantes de prácticas ofrecidas', 'conteo', 'entero'),
+    ( 'gasto_total_instruccional', 'Gasto total instruccional', 'moneda', 'decimal'),
+    ( 'num_estudiantes_fte', 'Número de estudiantes equivalentes a tiempo completo (FTE)', 'conteo', 'decimal'),
+    ( 'num_graduados_empleados_en_su_area', 'Número de graduados empleados en su área', 'conteo', 'entero'),
+    ( 'suma_duracion_sesiones', 'Suma de duración de sesiones', 'minutos', 'decimal'),
+    ( 'num_sesiones_totales', 'Número de sesiones totales', 'conteo', 'entero'),
+    ( 'num_sesiones_una_sola_pagina', 'Número de sesiones de una sola página', 'conteo', 'entero'),
+    ( 'num_paginas_vistas_totales', 'Número de páginas vistas totales', 'conteo', 'entero'),
+    ( 'num_recursos_bibliotecarios_totales', 'Número de recursos bibliotecarios totales', 'conteo', 'entero'),
+    ( 'ingreso_promedio_anual_por_estudiante', 'Ingreso promedio anual por estudiante', 'moneda', 'decimal'),
+    ( 'duracion_promedio_relacion_anios', 'Duración promedio de la relación (años)', 'años', 'decimal'),
+    ( 'num_programas_acreditados', 'Número de programas acreditados', 'conteo', 'entero'),
+    ( 'num_programas_totales', 'Número de programas totales', 'conteo', 'entero'),
+    ( 'num_cursos_o_programas_ofrecidos', 'Número de cursos o programas ofrecidos', 'conteo', 'entero'),
+    ( 'num_estudiantes_online', 'Número de estudiantes en línea', 'conteo', 'entero'),
+    ( 'num_estudiantes_presenciales', 'Número de estudiantes presenciales', 'conteo', 'entero'),
+    ( 'num_convenios_activos', 'Número de convenios activos', 'conteo', 'entero'),
+    ( 'num_estudiantes_aprueban_examen', 'Número de estudiantes que aprueban el examen', 'conteo', 'entero'),
+    ( 'num_estudiantes_presentan_examen', 'Número de estudiantes que presentan el examen', 'conteo', 'entero'),
+    ( 'num_patentes_otorgadas', 'Número de patentes otorgadas', 'conteo', 'entero'),
+    ( 'num_profesores_con_doctorado', 'Número de profesores con doctorado', 'conteo', 'entero'),
+    ( 'num_estudiantes_medio_tiempo', 'Número de estudiantes de medio tiempo', 'conteo', 'entero'),
+    ( 'num_estudiantes_con_ayuda_financiera', 'Número de estudiantes con ayuda financiera', 'conteo', 'entero'),
+    ( 'num_graduados_continuan_estudios', 'Número de graduados que continúan estudios', 'conteo', 'entero'),
+    ( 'num_profesores_participan_en_desarrollo_profesional', 'Número de profesores que participan en desarrollo profesional', 'conteo', 'entero'),
+    ( 'num_incidentes_disciplinarios', 'Número de incidentes disciplinarios', 'conteo', 'entero'),
+    ( 'num_estudiantes_nacionales', 'Número de estudiantes nacionales', 'conteo', 'entero'),
+    ( 'num_estudiantes_internacionales', 'Número de estudiantes internacionales', 'conteo', 'entero'),
+    ( 'monto_total_financiamiento_investigacion', 'Monto total de financiamiento para investigación', 'moneda', 'decimal'),
+    ( 'ingresos_educacion_continua', 'Ingresos por educación continua', 'moneda', 'decimal'),
+    ( 'ingresos_totales_institucion', 'Ingresos totales de la institución', 'moneda', 'decimal'),
+    ( 'ingresos_licenciamiento_patentes', 'Ingresos por licenciamiento y patentes', 'moneda', 'decimal'),
+    ( 'num_estudiantes_inscritos', 'Número de estudiantes inscritos', 'conteo', 'entero'),
+    ( 'num_camas_disponibles_dormitorios', 'Número de camas disponibles en dormitorios', 'conteo', 'entero'),
+    ( 'num_estudiantes_usan_servicios_salud_mental', 'Número de estudiantes que usan servicios de salud mental', 'conteo', 'entero'),
+    ( 'num_estudiantes_reinscritos_siguiente_periodo', 'Número de estudiantes reinscritos en el siguiente periodo', 'conteo', 'entero'),
+    ( 'num_estudiantes_elegibles_reinscripcion', 'Número de estudiantes elegibles para reinscripción', 'conteo', 'entero'),
+    ( 'suma_puntajes_encuesta_satisfaccion', 'Suma de puntajes de encuesta de satisfacción', 'puntos', 'decimal'),
+    ( 'num_encuestas_respondidas', 'Número de encuestas respondidas', 'conteo', 'entero'),
+    ( 'num_estudiantes_que_usan_servicios_apoyo', 'Número de estudiantes que usan servicios de apoyo', 'conteo', 'entero'),
+    ( 'num_estudiantes_en_intercambio', 'Número de estudiantes en intercambio', 'conteo', 'entero'),
+    ( 'num_estudiantes_transferidos_a_4anios', 'Número de estudiantes transferidos a instituciones de 4 años', 'conteo', 'entero'),
+    ( 'num_estudiantes_elegibles_transferencia', 'Número de estudiantes elegibles para transferencia', 'conteo', 'entero'),
+    ( 'num_cursos_con_analitica_implementada', 'Número de cursos con analítica implementada', 'conteo', 'entero'),
+    ( 'num_cursos_totales', 'Número de cursos totales', 'conteo', 'entero'),
+    ( 'num_admisiones_anio_actual', 'Número de admisiones del año actual', 'conteo', 'entero'),
+    ( 'num_admisiones_anio_anterior', 'Número de admisiones del año anterior', 'conteo', 'entero');
 
 INSERT INTO kpi_variable (id_kpi, id_variable) 
 VALUES 
@@ -319,103 +408,10 @@ VALUES
     ('55', '91');
 
 
-INSERT INTO variable (nombre_variable, nombre_display, unidad, tipo_dato) 
-VALUES 
-    ('num_accreditations_activas', 'Número de acreditaciones activas', 'conteo', 'entero'),
-    ('num_accreditations_totales', 'Número de acreditaciones totales', 'conteo', 'entero'),
-    ('posicion_ranking', 'Posición en el ranking', 'posición', 'entero'),
-    ('total_instituciones_en_ranking', 'Total de instituciones en el ranking', 'conteo', 'entero'),
-    ('num_admitidos', 'Número de admitidos', 'conteo', 'entero'),
-    ('num_solicitantes', 'Número de solicitantes', 'conteo', 'entero'),
-    ('num_alumni_donantes', 'Número de exalumnos donantes', 'conteo', 'entero'),
-    ('num_alumni_totales', 'Número de exalumnos totales', 'conteo', 'entero'),
-    ('dias_asistidos_totales', 'Días asistidos totales', 'conteo', 'entero'),
-    ( 'dias_clase_programados_totales', 'Días de clase programados totales', 'conteo', 'entero'),
-    ( 'num_estudiantes_totales', 'Número de estudiantes', 'conteo', 'entero'),
-    ( 'num_clases_totales', 'Número de clases totales', 'conteo', 'entero'),
-    ( 'suma_colegiaturas_cobradas', 'Suma de colegiaturas cobradas', 'moneda', 'decimal'),
-    ( 'suma_anios_hasta_graduacion_por_estudiante', 'Suma de años hasta graduación por estudiante', 'años', 'decimal'),
-    ( 'num_graduados_totales', 'Número de graduados totales', 'conteo', 'entero'),
-    ( 'suma_puntajes_examen', 'Suma de puntajes de examen', 'puntos', 'decimal'),
-    ( 'num_estudiantes_evaluados', 'Número de estudiantes evaluados', 'conteo', 'entero'),
-    ( 'num_incidentes_seguridad', 'Número de incidentes de seguridad', 'conteo', 'entero'),
-    ( 'poblacion_campus_total', 'Población total del campus', 'conteo', 'entero'),
-    ( 'num_consejeros', 'Número de consejeros', 'conteo', 'entero'),
-    ( 'num_estudiantes_que_completan_curso_online', 'Número de estudiantes que completan curso en línea', 'conteo', 'entero'),
-    ( 'num_estudiantes_inscritos_curso_online', 'Número de estudiantes inscritos en curso en línea', 'conteo', 'entero'),
-    ( 'num_estudiantes_completan_curso', 'Número de estudiantes que completan el curso', 'conteo', 'entero'),
-    ( 'num_estudiantes_inscritos_curso', 'Número de estudiantes inscritos en el curso', 'conteo', 'entero'),
-    ( 'num_prestamos_en_default', 'Número de préstamos en incumplimiento', 'conteo', 'entero'),
-    ( 'num_prestamos_totales_otorgados', 'Número de préstamos totales otorgados', 'conteo', 'entero'),
-    ( 'num_estudiantes_grupo_demografico_x', 'Número de estudiantes de un grupo demográfico', 'conteo', 'entero'),
-    ( 'num_grupos_demograficos_representados', 'Número de grupos demográficos representados', 'conteo', 'entero'),
-    ( 'num_estudiantes_que_abandonan', 'Número de estudiantes que abandonan', 'conteo', 'entero'),
-    ( 'num_estudiantes_inscritos_totales', 'Número de estudiantes inscritos totales', 'conteo', 'entero'),
-    ( 'valor_total_fondo_patrimonial', 'Valor total del fondo patrimonial (endowment)', 'moneda', 'decimal'),
-    ( 'num_actividades_extracurriculares_ofrecidas', 'Número de actividades extracurriculares ofrecidas', 'conteo', 'entero'),
-    ( 'num_estudiantes_participantes', 'Número de estudiantes participantes', 'conteo', 'entero'),
-    ( 'num_publicaciones_indexadas', 'Número de publicaciones indexadas', 'conteo', 'entero'),
-    ( 'num_profesores_investigadores', 'Número de profesores investigadores', 'conteo', 'entero'),
-    ( 'num_profesores_altamente_calificados', 'Número de profesores altamente calificados', 'conteo', 'entero'),
-    ( 'num_profesores_totales', 'Número de profesores totales', 'conteo', 'entero'),
-    ( 'num_profesores_que_se_van', 'Número de profesores que se van', 'conteo', 'entero'),
-    ( 'num_profesores_promedio_periodo', 'Número promedio de profesores en el periodo', 'conteo', 'decimal'),
-    ( 'num_publicaciones_totales', 'Número de publicaciones totales', 'conteo', 'entero'),
-    ( 'num_citas_totales', 'Número de citas académicas totales', 'conteo', 'entero'),
-    ( 'num_estudiantes_graduados_en_periodo', 'Número de estudiantes graduados en el periodo', 'conteo', 'entero'),
-    ( 'num_estudiantes_cohorte_inicial', 'Número de estudiantes de la cohorte inicial', 'conteo', 'entero'),
-    ( 'num_convenios_industria_activos', 'Número de convenios con la industria activos', 'conteo', 'entero'),
-    ( 'num_vacantes_practicas_ofrecidas', 'Número de vacantes de prácticas ofrecidas', 'conteo', 'entero'),
-    ( 'gasto_total_instruccional', 'Gasto total instruccional', 'moneda', 'decimal'),
-    ( 'num_estudiantes_fte', 'Número de estudiantes equivalentes a tiempo completo (FTE)', 'conteo', 'decimal'),
-    ( 'num_graduados_empleados_en_su_area', 'Número de graduados empleados en su área', 'conteo', 'entero'),
-    ( 'suma_duracion_sesiones', 'Suma de duración de sesiones', 'minutos', 'decimal'),
-    ( 'num_sesiones_totales', 'Número de sesiones totales', 'conteo', 'entero'),
-    ( 'num_sesiones_una_sola_pagina', 'Número de sesiones de una sola página', 'conteo', 'entero'),
-    ( 'num_paginas_vistas_totales', 'Número de páginas vistas totales', 'conteo', 'entero'),
-    ( 'num_recursos_bibliotecarios_totales', 'Número de recursos bibliotecarios totales', 'conteo', 'entero'),
-    ( 'ingreso_promedio_anual_por_estudiante', 'Ingreso promedio anual por estudiante', 'moneda', 'decimal'),
-    ( 'duracion_promedio_relacion_anios', 'Duración promedio de la relación (años)', 'años', 'decimal'),
-    ( 'num_programas_acreditados', 'Número de programas acreditados', 'conteo', 'entero'),
-    ( 'num_programas_totales', 'Número de programas totales', 'conteo', 'entero'),
-    ( 'num_cursos_o_programas_ofrecidos', 'Número de cursos o programas ofrecidos', 'conteo', 'entero'),
-    ( 'num_estudiantes_online', 'Número de estudiantes en línea', 'conteo', 'entero'),
-    ( 'num_estudiantes_presenciales', 'Número de estudiantes presenciales', 'conteo', 'entero'),
-    ( 'num_convenios_activos', 'Número de convenios activos', 'conteo', 'entero'),
-    ( 'num_estudiantes_aprueban_examen', 'Número de estudiantes que aprueban el examen', 'conteo', 'entero'),
-    ( 'num_estudiantes_presentan_examen', 'Número de estudiantes que presentan el examen', 'conteo', 'entero'),
-    ( 'num_patentes_otorgadas', 'Número de patentes otorgadas', 'conteo', 'entero'),
-    ( 'num_profesores_con_doctorado', 'Número de profesores con doctorado', 'conteo', 'entero'),
-    ( 'num_estudiantes_medio_tiempo', 'Número de estudiantes de medio tiempo', 'conteo', 'entero'),
-    ( 'num_estudiantes_con_ayuda_financiera', 'Número de estudiantes con ayuda financiera', 'conteo', 'entero'),
-    ( 'num_graduados_continuan_estudios', 'Número de graduados que continúan estudios', 'conteo', 'entero'),
-    ( 'num_profesores_participan_en_desarrollo_profesional', 'Número de profesores que participan en desarrollo profesional', 'conteo', 'entero'),
-    ( 'num_incidentes_disciplinarios', 'Número de incidentes disciplinarios', 'conteo', 'entero'),
-    ( 'num_estudiantes_nacionales', 'Número de estudiantes nacionales', 'conteo', 'entero'),
-    ( 'num_estudiantes_internacionales', 'Número de estudiantes internacionales', 'conteo', 'entero'),
-    ( 'monto_total_financiamiento_investigacion', 'Monto total de financiamiento para investigación', 'moneda', 'decimal'),
-    ( 'ingresos_educacion_continua', 'Ingresos por educación continua', 'moneda', 'decimal'),
-    ( 'ingresos_totales_institucion', 'Ingresos totales de la institución', 'moneda', 'decimal'),
-    ( 'ingresos_licenciamiento_patentes', 'Ingresos por licenciamiento y patentes', 'moneda', 'decimal'),
-    ( 'num_estudiantes_inscritos', 'Número de estudiantes inscritos', 'conteo', 'entero'),
-    ( 'num_camas_disponibles_dormitorios', 'Número de camas disponibles en dormitorios', 'conteo', 'entero'),
-    ( 'num_estudiantes_usan_servicios_salud_mental', 'Número de estudiantes que usan servicios de salud mental', 'conteo', 'entero'),
-    ( 'num_estudiantes_reinscritos_siguiente_periodo', 'Número de estudiantes reinscritos en el siguiente periodo', 'conteo', 'entero'),
-    ( 'num_estudiantes_elegibles_reinscripcion', 'Número de estudiantes elegibles para reinscripción', 'conteo', 'entero'),
-    ( 'suma_puntajes_encuesta_satisfaccion', 'Suma de puntajes de encuesta de satisfacción', 'puntos', 'decimal'),
-    ( 'num_encuestas_respondidas', 'Número de encuestas respondidas', 'conteo', 'entero'),
-    ( 'num_estudiantes_que_usan_servicios_apoyo', 'Número de estudiantes que usan servicios de apoyo', 'conteo', 'entero'),
-    ( 'num_estudiantes_en_intercambio', 'Número de estudiantes en intercambio', 'conteo', 'entero'),
-    ( 'num_estudiantes_transferidos_a_4anios', 'Número de estudiantes transferidos a instituciones de 4 años', 'conteo', 'entero'),
-    ( 'num_estudiantes_elegibles_transferencia', 'Número de estudiantes elegibles para transferencia', 'conteo', 'entero'),
-    ( 'num_cursos_con_analitica_implementada', 'Número de cursos con analítica implementada', 'conteo', 'entero'),
-    ( 'num_cursos_totales', 'Número de cursos totales', 'conteo', 'entero'),
-    ( 'num_admisiones_anio_actual', 'Número de admisiones del año actual', 'conteo', 'entero'),
-    ( 'num_admisiones_anio_anterior', 'Número de admisiones del año anterior', 'conteo', 'entero');
 
 ------------------------USUARIO ADMIN----------------------------
                         
 INSERT INTO USUARIOS 
 (usuario, password_hash )
 VALUES
-('admin','\$2b\$12\$Tv4.xxi0qVZPSGSVNjFvUOzXA2O1Kw7wJtvAYYlHU9UZwzdjholbm');
+('admin','$2b$12$H4Bg4iZGDjpsCChc31lt2eWa8vmKaM6f.uydwSxhU/.f2WRvMFw6a');
