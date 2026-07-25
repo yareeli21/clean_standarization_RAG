@@ -132,6 +132,18 @@ CREATE TABLE usuarios (
     creado_en TIMESTAMP DEFAULT NOW()
 );
 
+
+------------------------TABLA PARA ALMACENAR DATOS CRUDOS ----------------------------
+CREATE TABLE RAW_DATA (
+    id                  SERIAL PRIMARY KEY,
+    fecha               VARCHAR(50) UNIQUE NOT NULL,
+    Usuario             VARCHAR(255) NOT NULL,
+    subido              TIMESTAMP DEFAULT NOW(),
+    tipo_de_instumento  VARCHAR(30) NOT NULL,
+    archivo             VARCHAR(500) NOT NULL ---ruta de el archivo 
+
+);
+
 -- -- DATOS INICIALES: KPIS BY ADMINISTRATOR(LAYLA) -----------------------
 
 
@@ -415,3 +427,6 @@ INSERT INTO USUARIOS
 (usuario, password_hash )
 VALUES
 ('admin','$2b$12$H4Bg4iZGDjpsCChc31lt2eWa8vmKaM6f.uydwSxhU/.f2WRvMFw6a');
+
+
+
