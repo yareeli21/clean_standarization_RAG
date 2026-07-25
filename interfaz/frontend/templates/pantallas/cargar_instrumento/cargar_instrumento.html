@@ -64,17 +64,45 @@
 
             <div class="lista-datasets">
                 {% for instrumento in mis_instrumentos %}
-                <article class="tarjeta-dataset">
+                <article class="tarjeta-dataset" data-id="{{ instrumento.id }}">
                     <span class="pill-tipo">{{ instrumento.plataforma or "Instrumento" }}</span>
                     <h4 class="dataset-nombre">{{ instrumento.nombre }}</h4>
                     <span class="dataset-fecha">{{ instrumento.fecha_procesamiento.strftime('%d/%m/%Y') if instrumento.fecha_procesamiento else '' }}</span>
                     <span class="pill-estado">{{ instrumento.estado }}</span>
+                    <button class="boton-eliminar" onclick="eliminarInstrumento({{ instrumento.id }}, this)" title="Eliminar">🗑</button>
                 </article>
                 {% else %}
                 <p class="datasets-vacio">Aún no has cargado ningún instrumento.</p>
                 {% endfor %}
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Capa de metadatos: cubre el área de contenido, no la barra lateral -->
+<div class="capa-metadatos" id="capa-metadatos" style="display:none;">
+    <div class="panel-metadatos">
+        <div class="panel-metadatos-cabecera">
+            <h2>Metadatos</h2>
+            <button class="boton" id="chat-omitir">Omitir por ahora</button>
+        </div>
+        <p class="panel-subtitulo-oscuro">
+            El archivo ya se guardó. Los campos de metadatos por tipo de instrumento aún están en definición — por ahora puedes conversar libremente o continuar sin llenarlos.
+        </p>
+        <div class="chat-mensajes" id="chat-mensajes"></div>
+        <div class="chat-entrada">
+            <input type="text" id="chat-input" class="campo" placeholder="Escribe tu respuesta..." style="margin-bottom:0;">
+            <button class="boton" id="chat-enviar">Enviar</button>
+        </div>
+    </div>
+</div>
+<div class="capa-metadatos" id="capa-visor" style="display:none;">
+    <div class="panel-metadatos">
+        <div class="panel-metadatos-cabecera">
+            <h2 id="visor-titulo">Vista previa</h2>
+            <button class="boton" id="visor-cerrar">Cerrar</button>
+        </div>
+        <div id="visor-contenido" style="width:100%; height:70vh; overflow:auto; border-radius:8px;"></div>
     </div>
 </div>
 {% endblock %}
@@ -166,13 +194,11 @@
         border-radius: 999px;
     }
     .pill-estado {
-        position: absolute;
-        top: 0.75rem;
-        right: 0.9rem;
         font-size: 0.68rem;
         font-weight: 700;
         color: var(--color-azul-cielo);
         text-transform: capitalize;
+        align-self: flex-start;
     }
 
     .datasets-vacio {
@@ -186,11 +212,82 @@
     @media (max-width: 900px) {
         .layout-cargar { grid-template-columns: 1fr; }
     }
+
+    /* --- Botón eliminar en "Tus instrumentos cargados" --- */
+    .boton-eliminar {
+        position: absolute; top: 0.7rem; right: 0.9rem;
+        background: none; border: none; cursor: pointer; font-size: 0.85rem;
+        opacity: 0; transition: opacity 0.15s ease;
+    }
+    .tarjeta-dataset:hover .boton-eliminar { opacity: 0.8; }
+    .boton-eliminar:hover { opacity: 1; }
+
+    /* --- Capa de metadatos: cubre el área de contenido, no la barra lateral --- */
+    .capa-metadatos {
+        position: fixed;
+        top: 0; left: 230px; right: 0; bottom: 0;
+        background: rgba(12, 59, 46, 0.45);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 50;
+        padding: 2rem;
+    }
+    .panel-metadatos {
+        background: var(--color-Floral-White);
+        border-radius: var(--radio-borde);
+        box-shadow: var(--sombra-suave);
+        padding: 2rem;
+        width: 100%;
+        max-width: 640px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .panel-metadatos-cabecera {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .panel-metadatos-cabecera h2 {
+        margin: 0;
+        color: var(--color-azul-petroleo);
+        font-size: 1.4rem;
+    }
+    .panel-subtitulo-oscuro {
+        font-size: 0.85rem;
+        color: var(--color-texto-oscuro);
+        opacity: 0.75;
+        margin-bottom: 1rem;
+    }
+    .chat-mensajes { max-height: 260px; overflow-y: auto; margin: 0.75rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .chat-mensajes .msg { padding: 0.5rem 0.75rem; border-radius: 10px; font-size: 0.88rem; max-width: 85%; }
+    .chat-mensajes .msg-asistente { background: var(--color-beige); align-self: flex-start; }
+    .chat-mensajes .msg-usuario { background: var(--color-verde-claro); color: #fff; align-self: flex-end; }
+    .chat-entrada { display: flex; gap: 0.5rem; }
+    .chat-entrada .campo { flex: 1; margin-bottom: 0; }
 </style>
 {% endblock %}
 
 {% block js_extra %}
 <script>
+window.verCrudo = async function (idDrive, nombre) {
+    if (!idDrive || idDrive === 'None') {
+        alert('Este instrumento no tiene un archivo de Drive asociado.');
+        return;
+    }
+    document.getElementById('visor-titulo').textContent = nombre;
+    const contenedor = document.getElementById('visor-contenido');
+    contenedor.innerHTML = '<p style="padding:2rem;">Cargando...</p>';
+    document.getElementById('capa-visor').style.display = 'flex';
+
+    const respuesta = await fetch(`/cargar/preview/${idDrive}`);
+    contenedor.innerHTML = await respuesta.text();
+};
+
+document.getElementById('visor-cerrar').addEventListener('click', () => {
+    document.getElementById('capa-visor').style.display = 'none';
+    document.getElementById('visor-contenido').innerHTML = '';
+});
 (function () {
     const filtroTipo = document.getElementById('filtro-tipo-dataset');
     const filtroFecha = document.getElementById('filtro-fecha-dataset');
@@ -203,9 +300,96 @@
         if (!respuesta.ok) return;
         contenedor.innerHTML = await respuesta.text();
     }
-
     filtroTipo.addEventListener('change', actualizarDatasets);
     filtroFecha.addEventListener('change', actualizarDatasets);
+
+    // --- Subida vía fetch, para poder abrir la burbuja de metadatos después ---
+    const formulario = document.querySelector('.tarjeta-formulario form');
+    formulario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const datos = new FormData(formulario);
+        const respuesta = await fetch('/cargar', { method: 'POST', body: datos });
+        const data = await respuesta.json();
+        if (data.ok) {
+            abrirChatMetadatos(data.instrumento_id);
+        } else {
+            alert(data.error || 'No se pudo cargar el instrumento.');
+        }
+    });
+
+    // --- Chat de metadatos (burbuja flotante) ---
+    let historial = [];
+    let instrumentoActualId = null;
+    const capa = document.getElementById('capa-metadatos');
+    const chatMensajes = document.getElementById('chat-mensajes');
+    const chatInput = document.getElementById('chat-input');
+
+    function pintarMensaje(texto, rol) {
+        const div = document.createElement('div');
+        div.className = `msg msg-${rol === 'user' ? 'usuario' : 'asistente'}`;
+        div.textContent = texto;
+        chatMensajes.appendChild(div);
+        chatMensajes.scrollTop = chatMensajes.scrollHeight;
+    }
+
+    async function abrirChatMetadatos(instrumentoId) {
+        instrumentoActualId = instrumentoId;
+        historial = [];
+        chatMensajes.innerHTML = '';
+        capa.style.display = 'flex';
+
+        historial.push({ role: 'user', content: 'Acabo de subir un nuevo instrumento, empieza a preguntarme sobre él.' });
+        const data = await enviarTurno();
+        if (data.ok) pintarMensaje(data.respuesta, 'assistant');
+    }
+
+    async function enviarTurno() {
+        const respuesta = await fetch(`/cargar/${instrumentoActualId}/metadatos/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(historial),
+        });
+        return respuesta.json();
+    }
+
+    document.getElementById('chat-enviar').addEventListener('click', async () => {
+        const texto = chatInput.value.trim();
+        if (!texto) return;
+        pintarMensaje(texto, 'user');
+        historial.push({ role: 'user', content: texto });
+        chatInput.value = '';
+
+        const data = await enviarTurno();
+        if (data.ok) {
+            pintarMensaje(data.respuesta, 'assistant');
+            historial.push({ role: 'assistant', content: data.respuesta });
+        }
+    });
+
+    async function cerrarChat(guardarHistorial) {
+        await fetch(`/cargar/${instrumentoActualId}/metadatos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ historial: guardarHistorial ? historial : null }),
+        });
+        capa.style.display = 'none';
+        location.reload();
+    }
+
+    document.getElementById('chat-omitir').addEventListener('click', () => cerrarChat(false));
+
+    // --- Eliminar instrumento ---
+    window.eliminarInstrumento = async function (id, boton) {
+        if (!confirm('¿Eliminar este instrumento? Se borrará también de Drive.')) return;
+        const respuesta = await fetch(`/cargar/${id}`, { method: 'DELETE' });
+        const data = await respuesta.json();
+        if (data.ok) {
+            boton.closest('.tarjeta-dataset').remove();
+        } else {
+            alert(data.error || 'No se pudo eliminar.');
+        }
+    };
 })();
 </script>
+
 {% endblock %}

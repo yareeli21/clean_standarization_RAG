@@ -227,3 +227,9 @@ data/processed/
 
 # Docker volumes
 docker/volumnes/
+
+# Credenciales de Google Drive
+interfaz/backend/core/credentials.json
+
+interfaz/backend/core/oauth_credentials.json
+interfaz/backend/core/token.json

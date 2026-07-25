@@ -588,5 +588,5 @@ VALUES
 
 
 ALTER TABLE instrumento_procesado
-ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id);
+ADD COLUMN IF NOT EXISTS id_archivo_drive TEXT;
 

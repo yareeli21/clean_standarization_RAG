@@ -37,3 +37,10 @@ ipykernel==6.29.5
 # -- Testing -------------------------------------------
 pytest==8.3.3
 pytest-asyncio==0.24.0
+
+bcrypt<4.1
+
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
