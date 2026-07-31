@@ -4,6 +4,8 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 from langchain_ollama import OllamaLLM, OllamaEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+
 
 load_dotenv()
 
@@ -26,7 +28,7 @@ def load_documents(docs_path):#direccion donde deberian de estar todos los archi
     loader = DirectoryLoader(
         path=docs_path,
         glob="*.txt", #osea todos los archivos txt
-        loader_cls=lambda path: TextLoader(path, encoding="utf-8", autodetect_encoding=True)
+        loader_cls= lambda path: TextLoader(path, encoding="utf-8", autodetect_encoding=True)
     )
     documents = loader.load()
     
@@ -78,14 +80,14 @@ def create_vector_store(chunks, perisist_directory="db/chroma_Db"):
     """
     print("Creating embeddings and storing in ChromaDB...")
 
-    embedding_model = OllamaEmbeddings(model="nomic-embed-text:latest")
+    embedding_model = HuggingFaceEmbeddings(model="paraphrase-multilingual-mpnet-base-v2")
     
     print("--Creating vector store---")
     vector_store = Chroma.from_documents(
         documents= chunks,
         embedding= embedding_model,
         persist_directory= perisist_directory,
-        collection_metadata={"hhsw:space":"cosine"}#el algoritmo para la similitud
+        collection_metadata={"hnsw:space":"cosine"}#el algoritmo para la similitud
     )
     
     print("---Finished creating vector store---")
