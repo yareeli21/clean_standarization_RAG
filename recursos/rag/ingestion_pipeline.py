@@ -10,7 +10,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 load_dotenv()
 
 
-llm = OllamaLLM(model="llama3.2:1b")
+llm = OllamaLLM(model="llama3.2:3b")
 
 
 def load_documents(docs_path):#direccion donde deberian de estar todos los archivos del usuario 
